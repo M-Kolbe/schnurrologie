@@ -17,11 +17,12 @@ const EXPLAIN = (q, points, model) => ({ t: 'explain', q, points, model });
 export const CHAPTERS = [
   /* ================================================================ */
   {
-    id: 'ueberblick', title: 'Überblick: Was ist Verdauung?', short: 'Überblick', color: '#ff7a59', icon: '🗺️', cat: 'mo', page: 'Seite 2',
+    id: 'ueberblick', title: 'Überblick: Was ist Verdauung?', short: 'Überblick', color: '#e0603f', icon: '🗺️', cat: 'mo', page: 'Seite 2',
     story: 'Kater Mo hat seine Jause in Rekordzeit verschlungen und will wissen, wohin sein Futter eigentlich wandert. Erklär es ihm!',
     learn: `
 <h2>Verdauung in einem Satz</h2>
-<p><span class="k">Verdauung</span> = große Nährstoff-Moleküle (Kohlenhydrate, Fette, Eiweiße) werden <b>mechanisch</b> (zerkleinern, kneten) und <b>chemisch</b> (mit Enzymen) in ihre kleinen <b>Grundbausteine</b> zerlegt.</p>
+<p><span class="k">Verdauung</span> = große Nährstoff-Moleküle (<b>Makromoleküle</b>: Kohlenhydrate, Fette, Eiweiße) werden <b>mechanisch</b> (zerkleinern, kneten) und <b>chemisch</b> (mit Enzymen) in ihre kleinen <b>Grundbausteine</b> zerlegt.</p>
+<p>Das Verdauungssystem besteht aus mehreren funktionellen Einheiten, den <b>Verdauungsorganen</b>.</p>
 <ul>
 <li><b>Mechanisch:</b> Zähne zerkleinern, Zunge mischt, Magen knetet.</li>
 <li><b>Chemisch:</b> <b>Verdauungsenzyme</b> sind wie winzige Scheren. Beispiel: Proteine → Aminosäuren.</li>
@@ -74,7 +75,7 @@ export const CHAPTERS = [
   },
   /* ================================================================ */
   {
-    id: 'mund', title: 'Mundhöhle, Zähne & Speiseröhre', short: 'Mund & Zähne', color: '#e2557f', icon: '🦷', cat: 'luna', page: 'Seiten 3–4',
+    id: 'mund', title: 'Mundhöhle, Zähne & Speiseröhre', short: 'Mund & Zähne', color: '#d4467a', icon: '🦷', cat: 'luna', page: 'Seiten 3–4',
     story: 'Luna knabbert nur noch auf einer Seite. Zeig ihr, was Zähne, Speichel und Speiseröhre leisten!',
     learn: `
 <h2>Die Mundhöhle</h2>
@@ -96,6 +97,9 @@ export const CHAPTERS = [
 <tr><td>5</td><td><b>Weisheitszähne</b></td><td>3. Molaren</td><td>die hintersten Mahlzähne, ein Überbleibsel aus der Entwicklung des Menschen</td></tr>
 </table></div>
 <div class="box fix"><span class="t">⚠️ Korrektur zu Seite 3</span>Bei <b>3</b> und <b>4</b> sind die Namen vertauscht. Richtig ist:<br><b>3 = Backenzähne (Prämolaren)</b>, <b>4 = Mahlzähne (Molaren)</b>. Deine Beschreibungen der Funktionen daneben stimmen.</div>
+<h3>Das Milchgebiss</h3>
+<div class="figure" data-diagram="milchgebiss"></div>
+<p>Im Milchgebiss gibt es nur <b>1 Schneidezähne</b>, <b>2 Eckzähne</b> und <b>4 Mahlzähne</b>. Die <b>3 (Backenzähne/Prämolaren)</b> fehlt, sie kommen erst mit dem Dauergebiss.</p>
 <h3>Zahnformel</h3>
 <p>Man zählt <b>ein Viertel</b> des Gebisses, von der Mitte nach hinten: I – C – P – M.</p>
 <ul>
@@ -131,7 +135,7 @@ export const CHAPTERS = [
       { title: 'Verdauungsorgane – Funktion, Weg der Nahrung', ch: 'Studyflix', url: 'https://studyflix.de/biologie/verdauungsorgane-3106/video' },
     ],
     q: [
-      LABEL('zaehne', 'all', 'Beschrifte das Dauergebiss (1 bis 5).'),
+      Object.assign(LABEL('zaehne', 'all', 'Beschrifte das Dauergebiss (1 bis 5).'), { heft: 'Seite 3, Aufgabe A' }),
       F('Welches Enzym ist im Mundspeichel?', 'Amylase', ['Speichelamylase', 'Speichel-Amylase', 'Ptyalin', 'alpha-Amylase'], ['Pepsin', 'Lipase', 'Trypsin'], 'Die Amylase beginnt schon im Mund mit der Stärkeverdauung.'),
       F('Welchen Nährstoff spaltet die Amylase?', 'Stärke', ['Kohlenhydrate', 'Staerke'], ['Eiweiß', 'Fett', 'Maltose'], 'Amylase spaltet Stärke (ein Kohlenhydrat).'),
       F('Was entsteht, wenn die Amylase Stärke spaltet?', 'Maltose', ['Malzzucker'], ['Glucose', 'Aminosäuren', 'Fettsäuren'], 'Maltose = Malzzucker, besteht aus 2 Glucose-Molekülen.'),
@@ -147,12 +151,12 @@ export const CHAPTERS = [
       TF('In der Speiseröhre wird Stärke verdaut.', false, 'In der Speiseröhre finden keine Verdauungsvorgänge statt, nur Transport.'),
       F('Wie heißt die wellenförmige Muskelbewegung, die den Speisebrei transportiert?', 'Peristaltik', ['Peristaltick'], ['Emulgieren', 'Resorption', 'Verdauung'], 'Peristaltik = unwillkürliche Speiseröhrenbewegung.'),
       MC('Welche Bakterien im Speichel spielen bei Karies eine große Rolle?', 'Streptokokken', ['Salmonellen', 'Darmbakterien', 'Hefepilze'], 'Streptokokken sind kugelförmige Bakterien.'),
-      EXPLAIN('Kopfstand-Versuch: Erläutere, warum man im Kopfstand Wasser schlucken kann.', ['Die Speiseröhre transportiert durch Peristaltik', 'Peristaltik = wellenförmige Muskelbewegung, die aktiv weiterschiebt', 'Darum ist die Schwerkraft nicht nötig'], 'Ja, man kann schlucken. Die Muskeln der Speiseröhre schieben den Bissen durch die Peristaltik, eine wellenförmige Muskelbewegung, aktiv Richtung Magen. Dafür braucht man keine Schwerkraft.'),
+      Object.assign(EXPLAIN('Nachweis der Peristaltik: Mach einen Kopfstand. Eine Mitschülerin oder ein Mitschüler stützt dich, eine weitere Person gibt dir einen Trinkhalm. Versuche, einen Schluck aus dem Wasserglas zu trinken. Erläutere, ob du das Wasser schlucken konntest, und begründe, warum das möglich war.', ['Die Speiseröhre transportiert durch Peristaltik', 'Peristaltik = wellenförmige Muskelbewegung, die aktiv weiterschiebt', 'Darum ist die Schwerkraft nicht nötig'], 'Ja, man kann schlucken. Die Muskeln der Speiseröhre schieben den Bissen durch die Peristaltik, eine wellenförmige Muskelbewegung, aktiv Richtung Magen. Dafür braucht man keine Schwerkraft.'), { heft: 'Seite 4, Nachweis der Peristaltik' }),
     ],
   },
   /* ================================================================ */
   {
-    id: 'magen', title: 'Der Magen', short: 'Magen', color: '#d94f9a', icon: '🫄', cat: 'minka', page: 'Seiten 5–6',
+    id: 'magen', title: 'Der Magen', short: 'Magen', color: '#a64fc0', icon: '🫄', cat: 'minka', page: 'Seiten 5–6',
     story: 'Minka hat Sodbrennen und ein knurrendes Bäuchlein. Finde heraus, wie ein Magen funktioniert!',
     learn: `
 <h2>Bau und Aufgaben</h2>
@@ -212,16 +216,16 @@ export const CHAPTERS = [
       TF('Pepsin zerlegt Eiweiße direkt in einzelne Aminosäuren.', false, 'Pepsin macht Peptide (kürzere Ketten). Aminosäuren entstehen erst im Dünndarm durch Peptidasen.'),
       TF('Der Schleim schützt die Magenwand vor der Salzsäure und vor Selbstverdauung.', true),
       F('Wie heißt der Magenausgang?', 'Pförtner', ['Pfoertner', 'Magenpförtner'], ['Magenmund', 'Kehldeckel', 'Zwölffingerdarm'], 'Der Pförtner gibt den Brei portionsweise in den Dünndarm ab.'),
-      MC('Wie groß ist das Fassungsvermögen des Magens?', '1,5–2 Liter', ['0,2 Liter', '5 Liter', '10 Liter']),
+      Object.assign(MC('Wie groß ist das Fassungsvermögen des Magens?', '1,5–2 Liter', ['0,2 Liter', '5 Liter', '10 Liter']), { heft: 'Seite 5, Aufgabe a' }),
       MC('Wie viel Magensaft bildet die Magenschleimhaut pro Tag?', 'ca. 2 Liter', ['ca. 2 Milliliter', 'ca. 20 Liter', 'ca. 0,2 Liter']),
       ORDER('Wie kommt der Brei durch den Magen?', ['Speiseröhre', 'Magenmund (Schließmuskel)', 'Magen', 'Pförtner', 'Zwölffingerdarm']),
       EXPLAIN('Warum wird das Pepsin zuerst als inaktives Pepsinogen gebildet?', ['Schutz: Sonst würde das Enzym die eigenen Zellen (Hauptzellen/Magenwand) verdauen', 'Erst im Magen wandelt die Salzsäure Pepsinogen in Pepsin um', 'Zusätzlich schützt der Schleim der Nebenzellen die Magenwand'], 'Würde Pepsin gleich aktiv gebildet, würde es die Zellen verdauen, die es herstellen (Selbstverdauung). Darum bilden die Hauptzellen die inaktive Vorstufe Pepsinogen. Erst im Magen macht die Salzsäure daraus aktives Pepsin. Der Schleim der Nebenzellen schützt außerdem die Magenwand.'),
-      EXPLAIN('Was ist Sodbrennen und wie entsteht es?', ['Brennender Schmerz hinter dem Brustbein', 'Saurer Magensaft / Salzsäure fließt in die Speiseröhre zurück', 'Weil der Schließmuskel des Magenmundes nicht dicht schließt'], 'Sodbrennen ist ein brennender Schmerz hinter dem Brustbein. Er entsteht, wenn saurer Magensaft (Salzsäure) in die Speiseröhre zurückfließt, weil der Schließmuskel am Mageneingang nicht richtig schließt.'),
+      Object.assign(EXPLAIN('Was ist Sodbrennen und wie entsteht es?', ['Brennender Schmerz hinter dem Brustbein', 'Saurer Magensaft / Salzsäure fließt in die Speiseröhre zurück', 'Weil der Schließmuskel des Magenmundes nicht dicht schließt'], 'Sodbrennen ist ein brennender Schmerz hinter dem Brustbein. Er entsteht, wenn saurer Magensaft (Salzsäure) in die Speiseröhre zurückfließt, weil der Schließmuskel am Mageneingang nicht richtig schließt.'), { heft: 'Seite 6, Aufgabe c' }),
     ],
   },
   /* ================================================================ */
   {
-    id: 'leber', title: 'Leber, Galle & Bauchspeicheldrüse', short: 'Leber & Co.', color: '#b8563f', icon: '🧪', cat: 'felix', page: 'Seiten 6–7',
+    id: 'leber', title: 'Leber, Galle & Bauchspeicheldrüse', short: 'Leber & Co.', color: '#b5603e', icon: '🧪', cat: 'felix', page: 'Seiten 6–7',
     story: 'Felix hat zu fettes Futter erwischt. Welche Helfer-Organe braucht er jetzt, und was machen sie genau?',
     learn: `
 <h2>Die Leber</h2>
@@ -242,11 +246,12 @@ export const CHAPTERS = [
 <div class="box merk"><span class="t">💡 Merksatz</span>Galle ist wie <b>Spülmittel</b>: Sie zerteilt Fett in Tröpfchen. Spalten tut erst die <b>Lipase</b>. <b>Galle ist kein Enzym!</b></div>
 <h2>Die Bauchspeicheldrüse (Pankreas)</h2>
 <ul>
-<li>Ihr Ausgang mündet auch in den Gallengang, ihr Saft kommt also ebenfalls in den Zwölffingerdarm.</li>
+<li>Ihr Ausgang (der Bauchspeicheldrüsengang) mündet auch in den <b>Gallengang</b>. Beide Säfte kommen an derselben Mündung in den Zwölffingerdarm.</li>
 <li>Ihr Saft enthält die Verdauungsenzyme <b>Amylase</b>, <b>Trypsin</b> (und Chymotrypsin) und <b>Lipase</b>.</li>
 <li>Außerdem bildet sie die <b>Hormone</b> <b>Insulin</b> (senkt den Blutzucker) und <b>Glucagon</b> (hebt den Blutzucker). Das sind keine Verdauungsenzyme!</li>
 <li>Die Verdauungssäfte machen den sauren Brei aus dem Magen <b>alkalisch</b> (pH über 7). Nur so können die Enzyme im Dünndarm arbeiten.</li>
 </ul>
+<div class="box fix"><span class="t">⚠️ Korrektur zu Seite 7</span>Im Heft steht: „Die Enzyme aus der Bauchspeicheldrüse <s>und Gallenblase</s> sind für die endgültige Spaltung … notwendig.“<br>Die <b>Gallenblase liefert keine Enzyme</b>, nur die Galle, die Fette emulgiert. Die Enzyme kommen aus der Bauchspeicheldrüse und der Dünndarmschleimhaut.</div>
 <div class="box merk"><span class="t">💡 Eselsbrücken</span>Enzyme der Bauchspeicheldrüse: <b>A</b>lle <b>T</b>iere <b>L</b>ieben Katzen → <b>A</b>mylase, <b>T</b>rypsin, <b>L</b>ipase.<br><b>Insulin</b> bringt den Zucker <b>in</b> die Zellen → Blutzucker sinkt. <b>Glucagon</b> = „Glucose, go!“ → Blutzucker steigt.</div>
 <div class="box vet"><span class="t">🐾 Tierärztinnen-Wissen</span>Schon wenig Paracetamol ist für Katzen giftig. Ihrer Leber fehlt ein Enzym, mit dem wir Menschen den Wirkstoff abbauen (entgiften).</div>
 `,
@@ -284,7 +289,7 @@ export const CHAPTERS = [
   },
   /* ================================================================ */
   {
-    id: 'duenndarm', title: 'Dünndarm & Darmzotten', short: 'Dünndarm', color: '#e89b2f', icon: '🌀', cat: 'nala', page: 'Seiten 7–9',
+    id: 'duenndarm', title: 'Dünndarm & Darmzotten', short: 'Dünndarm', color: '#c98314', icon: '🌀', cat: 'nala', page: 'Seiten 7–9',
     story: 'Nala frisst viel, wird aber nicht satt. Zeig ihr, wie die Nährstoffe im Dünndarm ins Blut kommen!',
     learn: `
 <h2>Der Dünndarm</h2>
@@ -302,9 +307,10 @@ export const CHAPTERS = [
 </ul>
 <p>Mehr dazu im Kapitel „Vom Nährstoff zum Baustein“.</p>
 <h2>Aufnahme ins Blut: die Darmzotten</h2>
-<div class="figure" data-diagram="zotte"></div>
+<p><b>Seite 8, Abbildung 2</b> mit den Buchstaben aus dem Heft:</p>
+<div class="figure" data-diagram="seite8abb2"></div>
 <ul>
-<li>Die Innenwand hat viele <b>Falten</b> (Ringfalten, Kerckring-Falten).</li>
+<li>Die Innenwand hat viele <b>Falten</b> (Ringfalten, auch Kerckring-Falten genannt). Außen liegt die <b>Ring- und Längsmuskulatur</b>, sie bewegt den Darm.</li>
 <li>Auf den Falten sitzen winzige <b class="k">Darmzotten</b>.</li>
 <li>Auf den Darmzellen der Zotten sitzen noch winzigere Ausstülpungen: die <b class="k">Mikrovilli</b>. Zusammen bilden sie den <b>Bürstensaum</b>.</li>
 <li>In jeder Zotte gibt es feine <b>Blutgefäße (Kapillaren)</b> und ein <b>Lymphgefäß</b>.</li>
@@ -331,7 +337,7 @@ export const CHAPTERS = [
     ],
     q: [
       LABEL('zotte', 'all', 'Beschrifte den Bau des Dünndarms.'),
-      LABEL('zotte', ['darmzotte', 'mikrovilli', 'blutgefaess', 'lymphgefaess', 'darmzelle'], 'Beschrifte Abbildung 2 (Seite 8).'),
+      Object.assign(LABEL('zotte', ['darmzotte', 'mikrovilli', 'blutgefaess', 'lymphgefaess', 'darmzelle'], 'Beschrifte Abbildung 2 (Seite 8).'), { heft: 'Seite 8, Aufgabe a' }),
       MC('Wie lang ist der Dünndarm ungefähr?', '5–6 Meter', ['50 cm', '1,5 Meter', '20 Meter'], 'Der längste Abschnitt des Verdauungstraktes.'),
       F('Wie heißt der erste Abschnitt des Dünndarms?', 'Zwölffingerdarm', ['Zwoelffingerdarm', 'Duodenum'], ['Krummdarm', 'Blinddarm', 'Mastdarm'], 'Ca. 30 cm, „12 Finger breit“.'),
       F('Wie heißen die fingerförmigen Ausstülpungen der Dünndarmwand?', 'Darmzotten', ['Zotten', 'Darmzotte', 'Dünndarmzotten'], ['Mikrovilli', 'Krypten', 'Falten'], 'Darmzotten vergrößern die Oberfläche.'),
@@ -342,16 +348,27 @@ export const CHAPTERS = [
       TF('Die Darmzotten verkleinern die Oberfläche des Dünndarms.', false, 'Sie vergrößern die Oberfläche, damit mehr Nährstoffe aufgenommen werden können.'),
       ORDER('Ordne von groß nach winzig: Was vergrößert die Oberfläche?', ['Falten (Ringfalten)', 'Darmzotten', 'Mikrovilli'], 'Falten → Zotten → Mikrovilli.'),
       CLOZE('Ergänze den Text (Seite 8).', 'Die Innenwand des Dünndarms hat viele {Falten}, die mit winzigen {Darmzotten|Zotten} besetzt sind. Jede Zotte wird von feinen {Blutgefäßen|Kapillaren|Blutgefässen} und einem {Lymphgefäß|Lymphgefäss} durchzogen. Auf den Darmzotten sitzen die {Mikrovilli}, sie bilden den {Bürstensaum|Buerstensaum}.', ['Krypten', 'Dendriten', 'Pförtner']),
-      EXPLAIN('Erläutere das Prinzip der Oberflächenvergrößerung im Dünndarm.', ['Falten, Darmzotten und Mikrovilli vergrößern die Innenfläche', 'Größere Fläche = mehr Kontaktfläche', 'So können mehr Nährstoffe schneller ins Blut/die Lymphe aufgenommen werden'], 'Die Innenwand des Dünndarms ist in Falten gelegt, auf den Falten sitzen Darmzotten und auf den Darmzellen noch Mikrovilli. Dadurch wird die innere Oberfläche riesig vergrößert. Mit mehr Kontaktfläche können viel mehr Nährstoffe in kurzer Zeit ins Blut und in die Lymphe aufgenommen werden.'),
+      Object.assign(EXPLAIN('Erläutere mithilfe der Abbildung 2, welche Bedeutung der Aufbau der Darmzotten im Dünndarm für den Verdauungsvorgang hat. Gehe besonders auf das Prinzip der Oberflächenvergrößerung ein.', ['Falten, Darmzotten und Mikrovilli vergrößern die Innenfläche (Heft: ca. 1 Tennisplatz)', 'Größere Fläche = mehr Kontaktfläche', 'So können mehr Nährstoffe schneller ins Blut/die Lymphe aufgenommen werden'], 'Die Innenwand des Dünndarms ist in Falten gelegt, auf den Falten sitzen Darmzotten und auf den Darmzellen noch Mikrovilli. Dadurch wird die innere Oberfläche riesig vergrößert. Mit mehr Kontaktfläche können viel mehr Nährstoffe in kurzer Zeit ins Blut und in die Lymphe aufgenommen werden.'), { heft: 'Seite 9, Aufgabe c' }),
     ],
   },
   /* ================================================================ */
   {
-    id: 'abbau', title: 'Vom Nährstoff zum Baustein', short: 'Nährstoff → Baustein', color: '#7a5ce0', icon: '🧩', cat: 'simba', page: 'Seite 8 (die Katzen-Stelle)',
+    id: 'abbau', title: 'Vom Nährstoff zum Baustein', short: 'Nährstoff → Baustein', color: '#6656e0', icon: '🧩', cat: 'simba', page: 'Seite 8 (die Katzen-Stelle)',
     story: 'Simba will wissen, was aus Fett, Eiweiß und Kohlenhydraten in seinem Napf wird. Das ist die Stelle mit der Katze auf Seite 8!',
     learn: `
 <h2>Die drei Nährstoffe und ihre Bausteine</h2>
-<p>Das ist die Abbildung <b>„Vorgänge bei der Verdauung“</b> von Seite 8 (neben der gezeichneten Katze). Lies sie wie ein Comic von links nach rechts.</p>
+<p>Das ist die Abbildung <b>„Vorgänge bei der Verdauung“</b> von Seite 8 (neben der gezeichneten Katze), so wie im Heft.</p>
+<div class="figure" data-diagram="seite8abb1"></div>
+<h3>So liest du Abbildung 1</h3>
+<ol>
+<li><b>Links die Legende:</b> Sie zeigt, wie die Teilchen aussehen. Fette = Glycerin (kurzes Stück) + Fettsäuren (lange Stäbchen). Proteine = Ketten aus Perlen (Aminosäuren). Kohlenhydrate = Ketten aus Ringen (Glucose).</li>
+<li><b>In der Mitte der Dünndarm:</b> Links liegen noch die <b>großen</b> Teilchen (Stärke-Ketten, Protein-Knäuel, ganze Fette). Nach rechts werden sie von den <b>Enzymen</b> immer kleiner geschnitten: Stärke → Maltose → Glucose, Proteine → Oligopeptide → Aminosäuren, Fette → Glycerin + Fettsäuren.</li>
+<li><b>Die gestrichelten Linien</b> sind die Dünndarmwand. Nur die <b>kleinsten Bausteine</b> passen durch.</li>
+<li><b>Rote Pfeile → Blutgefäß:</b> <b>Glucose</b> und <b>Aminosäuren</b> gehen ins Blut und über die Pfortader zur Leber.</li>
+<li><b>Grüne Pfeile → Lymphgefäß:</b> <b>Fettsäuren</b> und <b>Glycerin</b> gehen in die Lymphe und über die obere Hohlvene später ins Blut.</li>
+</ol>
+<div class="box merk"><span class="t">💡 Darum geht es</span>Nährstoffe müssen in die <b>kleinsten Bausteine</b> zerlegt werden, sonst kommen sie nicht durch die Darmwand ins Blut und damit in alle Körperregionen.</div>
+<h3>Dasselbe als Kette</h3>
 <div class="figure" data-diagram="abbau"></div>
 <div class="tablewrap"><table>
 <tr><th>Nährstoff</th><th>Enzym(e)</th><th>Zwischenstufe</th><th>Enzym</th><th>Baustein</th><th>geht ins</th></tr>
@@ -379,6 +396,10 @@ Enzyme erkennst du an der Endung <b>-ase</b>: Malt<b>ase</b> spaltet Malt<b>ose<
 `,
     video: [
       { cat: 'doc', say: 'Das ist die wichtige Stelle mit der Katze auf Seite acht. Wir verfolgen drei Nährstoffe bis zu ihren Bausteinen.' },
+      { d: 'seite8abb1', hl: ['fettsaeuren', 'glycerin', 'proteine', 'oligopeptide', 'aminosaeuren', 'staerke', 'maltose', 'glucose'], say: 'So sieht die Abbildung im Heft aus. Links ist die Legende: Fette bestehen aus Glycerin und Fettsäuren, Proteine aus Aminosäuren, und Kohlenhydrate aus Glucose-Ringen.' },
+      { d: 'seite8abb1', hl: ['darm8'], say: 'In der Mitte ist der Dünndarm. Links schwimmen noch große Teilchen, nach rechts schneiden die Enzyme sie immer kleiner.' },
+      { d: 'seite8abb1', hl: ['blutgefaess8'], say: 'Nur die kleinsten Bausteine passen durch die Darmwand. Glucose und Aminosäuren gehen ins Blutgefäß, das sind die roten Pfeile.' },
+      { d: 'seite8abb1', hl: ['lymphgefaess8'], say: 'Fettsäuren und Glycerin gehen ins Lymphgefäß, das sind die grünen Pfeile. Über die obere Hohlvene kommen auch sie später ins Blut.' },
       { d: 'abbau', hl: ['staerke'], say: 'Kohlenhydrate: Stärke ist eine lange Kette aus Glucose-Ringen.' },
       { d: 'abbau', hl: ['maltose'], say: 'Die Amylase aus Mund und Bauchspeicheldrüse schneidet sie in Maltose, das sind zwei Ringe.' },
       { d: 'abbau', hl: ['glucose', 'blut-kh'], say: 'Die Maltase im Dünndarm macht daraus einzelne Glucose. Die geht ins Blut.' },
@@ -408,12 +429,12 @@ Enzyme erkennst du an der Endung <b>-ase</b>: Malt<b>ase</b> spaltet Malt<b>ose<
       F('Welches Enzym spaltet Fette?', 'Lipase', [], ['Galle', 'Maltase', 'Pepsin'], 'Lipase, nachdem die Galle emulgiert hat.'),
       CLOZE('Ergänze die drei Abbauwege.', 'Stärke → {Maltose} → {Glucose|Glukose}. Proteine → {Oligopeptide|Peptide} → {Aminosäuren}. Fette → {Glycerin} und {Fettsäuren}.', ['Lipase', 'Galle', 'Laktose']),
       TF('Fette werden nur zu Fettsäuren abgebaut.', false, 'Zu Glycerin UND Fettsäuren.'),
-      EXPLAIN('Erläutere mithilfe der Abbildung die Vorgänge bei der Verdauung im Dünndarm (Seite 9, Aufgabe b).', ['Enzyme zerlegen die Nährstoffe in Bausteine: Stärke → Glucose, Proteine → Aminosäuren, Fette → Glycerin + Fettsäuren', 'Galle emulgiert vorher die Fette', 'Die Bausteine werden durch die Dünndarmwand (Darmzotten) aufgenommen', 'Glucose und Aminosäuren → Blut (Pfortader → Leber), Fettsäuren und Glycerin → Lymphe'], 'Im Dünndarm zerlegen Enzyme die Nährstoffe in ihre Bausteine: Die Amylase spaltet Stärke zu Maltose, die Maltase spaltet Maltose zu Glucose. Peptidasen wie Trypsin zerlegen Proteine in Aminosäuren. Die Galle emulgiert die Fette, dann spaltet die Lipase sie in Glycerin und Fettsäuren. Die Bausteine werden über die Darmzotten aufgenommen: Glucose und Aminosäuren ins Blut (über die Pfortader zur Leber), Fettsäuren und Glycerin in die Lymphe.'),
+      Object.assign(EXPLAIN('Erläutere mithilfe der Abbildung 1 und des Infotextes die Vorgänge bei der Verdauung im Dünndarm.', ['Enzyme zerlegen die Nährstoffe in Bausteine: Stärke → Glucose, Proteine → Aminosäuren, Fette → Glycerin + Fettsäuren', 'Galle emulgiert vorher die Fette', 'Die Bausteine werden durch die Dünndarmwand (Darmzotten) aufgenommen', 'Glucose und Aminosäuren → Blut (Pfortader → Leber), Fettsäuren und Glycerin → Lymphe'], 'Im Dünndarm zerlegen Enzyme die Nährstoffe in ihre Bausteine: Die Amylase spaltet Stärke zu Maltose, die Maltase spaltet Maltose zu Glucose. Peptidasen wie Trypsin zerlegen Proteine in Aminosäuren. Die Galle emulgiert die Fette, dann spaltet die Lipase sie in Glycerin und Fettsäuren. Die Bausteine werden über die Darmzotten aufgenommen: Glucose und Aminosäuren ins Blut (über die Pfortader zur Leber), Fettsäuren und Glycerin in die Lymphe.'), { heft: 'Seite 9, Aufgabe b' }),
     ],
   },
   /* ================================================================ */
   {
-    id: 'zoeliakie', title: 'Zöliakie & Unverträglichkeiten', short: 'Zöliakie', color: '#3fa16a', icon: '🌾', cat: 'kiki', page: 'Seiten 9–10',
+    id: 'zoeliakie', title: 'Zöliakie & Unverträglichkeiten', short: 'Zöliakie', color: '#2f9a5c', icon: '🌾', cat: 'kiki', page: 'Seiten 9–10',
     story: 'Kiki bekommt von Milch Bauchweh. Ist das eine Allergie? Finde den Unterschied heraus!',
     learn: `
 <h2>Zöliakie</h2>
@@ -457,12 +478,12 @@ Enzyme erkennst du an der Endung <b>-ase</b>: Malt<b>ase</b> spaltet Malt<b>ose<
       F('Welches Enzym fehlt bei Laktoseintoleranz?', 'Laktase', ['Lactase'], ['Lipase', 'Maltase', 'Amylase'], 'Laktase spaltet Laktose (Milchzucker).'),
       TF('Bei der erblichen Fruktoseintoleranz fehlt das Enzym „Fruktase“.', false, 'Es fehlt Aldolase B. Ein Enzym namens Fruktase gibt es nicht.'),
       F('Was ist eine Allergie?', 'Überreaktion des Immunsystems', ['Überreaktion des Immunsystems auf harmlose Stoffe', 'Ueberreaktion des Immunsystems', 'Immunreaktion'], ['Enzymmangel', 'Vitaminmangel', 'Darmentzündung durch Bakterien'], 'Das Immunsystem reagiert auf eigentlich harmlose Stoffe.'),
-      EXPLAIN('Vergleiche den Dünndarm eines Zöliakie-Patienten mit dem eines gesunden Menschen und erkläre die Symptome.', ['Bei Zöliakie sind die Darmzotten kleiner/flacher (entzündete Schleimhaut)', 'Dadurch ist die Oberfläche kleiner', 'Es werden weniger Nährstoffe aufgenommen → Müdigkeit, Antriebslosigkeit', 'Unverdaute Reste im Darm → Bauchschmerzen, Durchfall'], 'Beim gesunden Menschen sind die Darmzotten lang und die Oberfläche groß. Bei Zöliakie ist die Schleimhaut entzündet, die Zotten sind klein und flach, also ist die Oberfläche viel kleiner. Deshalb werden weniger Nährstoffe aufgenommen: Die Patienten sind müde und antriebslos. Was unverdaut im Darm bleibt, verursacht Bauchschmerzen und Durchfall.'),
+      Object.assign(EXPLAIN('Vergleiche den Bau des Dünndarms eines Zöliakiepatienten mit dem eines gesunden Menschen und stelle mögliche Zusammenhänge zu den Symptomen der Patienten dar.', ['Bei Zöliakie sind die Darmzotten kleiner/flacher (entzündete Schleimhaut)', 'Dadurch ist die Oberfläche kleiner', 'Es werden weniger Nährstoffe aufgenommen → Müdigkeit, Antriebslosigkeit', 'Unverdaute Reste im Darm → Bauchschmerzen, Durchfall'], 'Beim gesunden Menschen sind die Darmzotten lang und die Oberfläche groß. Bei Zöliakie ist die Schleimhaut entzündet, die Zotten sind klein und flach, also ist die Oberfläche viel kleiner. Deshalb werden weniger Nährstoffe aufgenommen: Die Patienten sind müde und antriebslos. Was unverdaut im Darm bleibt, verursacht Bauchschmerzen und Durchfall.'), { heft: 'Seite 10, Aufgabe b' }),
     ],
   },
   /* ================================================================ */
   {
-    id: 'dickdarm', title: 'Der Dickdarm', short: 'Dickdarm', color: '#8a6a4a', icon: '🦠', cat: 'tiger', page: 'Seite 11',
+    id: 'dickdarm', title: 'Der Dickdarm', short: 'Dickdarm', color: '#7a6852', icon: '🦠', cat: 'tiger', page: 'Seite 11',
     story: 'Tiger hatte eine Blinddarm-OP – oder doch nicht? Finde heraus, was im Dickdarm passiert!',
     learn: `
 <h2>Bau</h2>
@@ -510,12 +531,12 @@ Enzyme erkennst du an der Endung <b>-ase</b>: Malt<b>ase</b> spaltet Malt<b>ose<
       ORDER('Der letzte Weg: Bring in die richtige Reihenfolge.', ['Dünndarm', 'Blinddarm', 'Dickdarm', 'Mastdarm', 'After']),
       SORT('Dünndarm oder Dickdarm?', ['Dünndarm', 'Dickdarm'], [['5–6 m lang', 0], ['ca. 1,5 m lang', 1], ['hat Zotten', 0], ['keine Zotten', 1], ['Ø 2,5 cm', 0], ['Ø 5–8 cm', 1], ['Nährstoffe werden aufgenommen', 0], ['Wasser wird zurückgeholt', 1]]),
       F('Wie heißt der Endabschnitt des Dickdarms?', 'Mastdarm', ['Enddarm', 'Rektum'], ['Blinddarm', 'Krummdarm', 'Zwölffingerdarm'], 'Mastdarm = Enddarm.'),
-      EXPLAIN('Wofür haben wir die Bakterien der Darmflora? (Seite 11, b)', ['Sie bauen Stoffe ab, die wir selbst nicht verdauen können', 'z. B. Cellulose', 'Sie unterstützen dadurch unsere Verdauung'], 'Die Bakterien der Darmflora bauen Stoffe ab, die wir selbst nicht verdauen können, zum Beispiel Cellulose aus Pflanzen. So unterstützen sie unsere Verdauung.'),
+      Object.assign(EXPLAIN('Das Mikrobiom, auch Darmflora genannt, besteht aus Bakterien, die bei der Verdauung helfen. Wofür haben wir diese Bakterien?', ['Sie bauen Stoffe ab, die wir selbst nicht verdauen können', 'z. B. Cellulose', 'Sie unterstützen dadurch unsere Verdauung'], 'Die Bakterien der Darmflora bauen Stoffe ab, die wir selbst nicht verdauen können, zum Beispiel Cellulose aus Pflanzen. So unterstützen sie unsere Verdauung.'), { heft: 'Seite 11, Aufgabe b' }),
     ],
   },
   /* ================================================================ */
   {
-    id: 'enzyme', title: 'Alle Enzyme auf einen Blick', short: 'Enzyme', color: '#c0478c', icon: '✂️', cat: 'zimt', page: 'Seiten 3–10',
+    id: 'enzyme', title: 'Alle Enzyme auf einen Blick', short: 'Enzyme', color: '#2f7fd1', icon: '✂️', cat: 'zimt', page: 'Seiten 3–10',
     story: 'Zimt sortiert die Enzym-Scheren der Klinik. Weißt du, welche Schere wo liegt und was sie schneidet?',
     learn: `
 <h2>Was sind Enzyme?</h2>
@@ -588,7 +609,7 @@ Enzyme erkennst du an der Endung <b>-ase</b>: Malt<b>ase</b> spaltet Malt<b>ose<
   },
   /* ================================================================ */
   {
-    id: 'neuron', title: 'Die Nervenzelle (Neuron)', short: 'Nervenzelle', color: '#1fa99a', icon: '⚡', cat: 'pixel', page: 'Arbeitsblatt Neuron',
+    id: 'neuron', title: 'Die Nervenzelle (Neuron)', short: 'Nervenzelle', color: '#0b8f80', icon: '⚡', cat: 'pixel', page: 'Arbeitsblatt Neuron',
     story: 'Pixels Schnurrhaare kribbeln. Die Signale laufen über Nervenzellen. Kannst du so eine Zelle beschriften?',
     learn: `
 <h2>Aufbau einer Nervenzelle</h2>
@@ -633,7 +654,7 @@ Enzyme erkennst du an der Endung <b>-ase</b>: Malt<b>ase</b> spaltet Malt<b>ose<
       { title: 'Nervenzelle Aufbau und Funktion', ch: 'Learning Level Up', url: 'https://www.youtube.com/watch?v=tiNWPKoUwkU' },
     ],
     q: [
-      LABEL('neuron', 'all', 'Beschrifte die Nervenzelle (1 bis 9).'),
+      Object.assign(LABEL('neuron', 'all', 'Beschrifte die Nervenzelle (1 bis 9).'), { heft: 'Arbeitsblatt, Aufgabe 2' }),
       LABEL('neuron', ['dendriten', 'zellkoerper', 'zellkern', 'axonhuegel', 'axon'], 'Beschrifte den Zellkörper-Bereich.'),
       LABEL('neuron', ['endknoepfchen', 'synapse', 'schwann', 'axon', 'ranvier'], 'Beschrifte den Axon-Bereich.'),
       ORDER('Weg des Signals durch die Nervenzelle', ['Dendriten', 'Zellkörper', 'Axonhügel', 'Axon', 'Endknöpfchen', 'Synapse'], 'Merksatz: Die Zauberkatze Ahnt Alles, Ehrlich Sicher!'),
@@ -709,39 +730,217 @@ export const PLAN = [
   ] },
 ];
 
+/* ---------- extra questions: every task and every fact of the 11 pages (appended, so older ids stay stable) ---------- */
+const EXTRA = {
+  ueberblick: [
+    CLOZE('Lückentext zu Seite 2', 'Unter {Verdauung} versteht man die mechanische und {chemische} Zerlegung der großen Nährstoff-Moleküle. Mithilfe von {Verdauungsenzymen|Enzymen} werden diese {Makromoleküle} in ihre {Grundbausteine|Bausteine} zerlegt, z. B. Proteine in {Aminosäuren}. Von der Mundhöhle bis zum {Dünndarm} finden enzymatische Abbauvorgänge statt. Im {Dickdarm} wird vor allem {Wasser} resorbiert.', ['Glucose', 'Magen', 'Hormonen']),
+    F('Wie nennt man die großen Moleküle der Nährstoffe (z. B. Proteine, Stärke)?', 'Makromoleküle', ['Makromolekül', 'Makromolekuele'], ['Mikrovilli', 'Grundbausteine', 'Enzyme'], 'Makro = groß. Sie werden in kleine Grundbausteine zerlegt.'),
+    F('Wie heißen die funktionellen Einheiten des Verdauungssystems?', 'Verdauungsorgane', ['Organe', 'Verdauungsorgan'], ['Verdauungsenzyme', 'Nährstoffe', 'Drüsen'], 'Das Verdauungssystem besteht aus den Verdauungsorganen.'),
+    MC('Welche drei Nährstoff-Gruppen werden verdaut?', 'Kohlenhydrate, Fette, Eiweiße', ['Vitamine, Mineralstoffe, Wasser', 'Glucose, Aminosäuren, Fettsäuren', 'Amylase, Pepsin, Lipase'], 'Glucose, Aminosäuren und Fettsäuren sind schon die Bausteine. Amylase, Pepsin und Lipase sind Enzyme.'),
+    EXPLAIN('Ein Käsebrot auf Reisen: Beschreibe, was mit der Stärke (Brot), dem Eiweiß und dem Fett (Käse) auf dem Weg durch den Körper passiert.', ['Mund: Zähne zerkleinern, Amylase spaltet Stärke zu Maltose', 'Magen: Salzsäure + Pepsin spalten Eiweiß zu Peptiden', 'Dünndarm: Galle emulgiert Fett; Bauchspeicheldrüse (Amylase, Trypsin, Lipase) und Darm-Enzyme (Maltase, Peptidasen) zerlegen alles in Bausteine', 'Bausteine: Glucose, Aminosäuren, Fettsäuren + Glycerin; Aufnahme über die Darmzotten ins Blut bzw. in die Lymphe', 'Dickdarm: Wasser zurückholen, Rest als Kot über den After'], 'Im Mund zerkleinern die Zähne das Brot und die Amylase spaltet einen Teil der Stärke zu Maltose. Die Speiseröhre transportiert den Bissen durch Peristaltik in den Magen. Dort spaltet Pepsin (aktiviert durch Salzsäure) das Eiweiß des Käses zu Peptiden. Im Dünndarm emulgiert die Galle das Fett, die Enzyme der Bauchspeicheldrüse (Amylase, Trypsin, Lipase) und der Darmschleimhaut (Maltase, Peptidasen) zerlegen alles in Bausteine: Glucose, Aminosäuren, Fettsäuren und Glycerin. Diese werden über die Darmzotten aufgenommen: Glucose und Aminosäuren ins Blut (Pfortader → Leber), die Fettbausteine in die Lymphe. Im Dickdarm wird Wasser zurückgeholt, der Rest wird als Kot ausgeschieden.'),
+  ],
+  mund: [
+    Object.assign({ t: 'formula', which: 'dauer', q: 'Gib die Zahnformel des Dauergebisses an (Seite 4).' }, { heft: 'Seite 4, Aufgabe B' }),
+    Object.assign({ t: 'formula', which: 'milch', q: 'Gib die Zahnformel des Milchgebisses an (Seite 4).' }, { heft: 'Seite 4, Aufgabe B' }),
+    Object.assign(LABEL('milchgebiss', 'all', 'Beschrifte das Milchgebiss (1, 2, 4 wie auf Seite 3).'), { heft: 'Seite 3, Aufgabe A' }),
+    F('Warum fehlt beim Milchgebiss die Nummer 3?', 'keine Prämolaren', ['keine Backenzähne', 'es gibt keine Prämolaren', 'weil es keine Backenzähne hat', 'Prämolaren fehlen', 'keine Praemolaren'], ['keine Eckzähne', 'keine Schneidezähne', 'keine Mahlzähne'], 'Im Milchgebiss gibt es noch keine Backenzähne (Prämolaren).'),
+    CLOZE('Lückentext zu Seite 3', 'Die Verdauung beginnt in der {Mundhöhle}. Beim Kauen wird die Nahrung durch die {Zähne} zerkleinert. Das Einspeicheln macht sie {gleitfähig}, und erste {Enzyme} wirken. Speichel kommt aus vielen kleinen Drüsen der Mundschleimhaut und aus drei großen Speicheldrüsen: der {Ohrspeicheldrüse}, der {Unterkieferspeicheldrüse} und der {Unterzungenspeicheldrüse}. Das Enzym {Amylase} baut einen Teil der {Stärke} zu {Maltose} ab. Maltose besteht aus zwei Molekülen {Glucose|Glukose}.', ['Pepsin', 'Fett', 'Leber']),
+    F('Welche Funktion hatten die Eckzähne ursprünglich (bei Tieren)?', 'Reißen der Beute', ['Beute reißen', 'zum Reißen der Beute', 'Reißzähne', 'reißen', 'Beute festhalten und reißen'], ['Zermahlen von Pflanzen', 'Abbeißen von Gras', 'Saugen'], 'Die Eckzähne sind ein Relikt der Reißzähne. Beim Menschen halten sie fest und reißen ab.'),
+    F('Wie viele Höcker hat die Kaufläche eines Backenzahns (Prämolar)?', '2', ['zwei', '2 Höcker'], ['1', '4', 'keinen'], 'Prämolaren haben 2 Höcker, Molaren mehrere.'),
+    F('Welcher Teil verschließt beim Schlucken die Luftröhre?', 'Kehldeckel', [], ['Zunge', 'Schließmuskel', 'Pförtner'], 'Der Kehldeckel sorgt dafür, dass der Bissen in die Speiseröhre gelangt.'),
+    MC('Wie viele Muskeln sorgen gemeinsam mit dem Kehldeckel für das Schlucken?', 'mehr als 20', ['genau 2', 'etwa 5', 'über 200']),
+    F('Was sitzt am Ende der Speiseröhre und wirkt wie ein Ventil?', 'Schließmuskel', ['Schliessmuskel', 'ein Schließmuskel'], ['Kehldeckel', 'Pförtner', 'Zwölffingerdarm'], 'Er lässt den Speisebrei in den Magen, aber nicht zurück.'),
+    MC('Wie viele Mikroorganismen sind ungefähr in einem Tropfen Speichel?', 'ca. 10 Millionen', ['ca. 10', 'ca. 1000', 'gar keine']),
+  ],
+  magen: [
+    CLOZE('Lückentext zu Seite 5', 'Durch den {Mageneingang|Magenmund} kommt der Nahrungsbrei in den Magen. Dort wird er zwischengespeichert, weiter verdaut, {durchgeknetet} und durch den {Magenausgang|Pförtner} portionsweise an den {Dünndarm|Zwölffingerdarm} weitergegeben. Die Magenschleimhaut bildet täglich ca. 2 Liter {Magensaft}. Die {Salzsäure|Magensäure} wird in den {Belegzellen} gebildet. Das inaktive {Pepsinogen} entsteht in den {Hauptzellen} und wird durch die Salzsäure in das aktive {Pepsin} umgewandelt. Die {Nebenzellen} bilden den Magenschleim.', ['Galle', 'Lipase', 'Leber']),
+    CLOZE('Aufgabe 5b: Aufgaben der Magenzellen', 'Hauptzellen bilden {Pepsinogen}, die inaktive Vorstufe von {Pepsin}. Nebenzellen bilden {Schleim|Magenschleim}, der die Magenwand vor Salzsäure und {Selbstverdauung} schützt. Belegzellen bilden {Salzsäure|Magensäure} mit einem pH-Wert von {2|zwei}: Sie tötet {Bakterien}, lässt die Nahrung {aufquellen} und wandelt Pepsinogen in Pepsin um.', ['Insulin', 'Amylase', '7']),
+    MC('Welche Nahrung bleibt am längsten im Magen?', 'Ölsardinen (bis zu 12 Stunden)', ['Fisch (gut 1 Stunde)', 'Schweinebraten (5–7 Stunden)', 'Wasser']),
+    MC('Wie entsteht Magenknurren?', 'Der leere Magen wird durchgeknetet', ['Der volle Magen platzt fast', 'Die Galle blubbert', 'Bakterien im Magen bilden Gas']),
+    MC('Wie oft wird der Speisebrei im Magen durchgeknetet?', 'etwa alle 20 Sekunden', ['einmal pro Stunde', 'nie', 'jede Sekunde']),
+    MULTI('Welche Bestandteile hat der Magensaft?', ['Salzsäure', 'Schleim', 'Enzyme (Pepsin)'], ['Galle', 'Insulin', 'Lipase aus der Bauchspeicheldrüse']),
+    EXPLAIN('Fisch bleibt gut 1 Stunde im Magen, Ölsardinen bis zu 12 Stunden. Erkläre den Unterschied.', ['Ölsardinen enthalten sehr viel Fett', 'Fettreiche Nahrung bleibt länger im Magen (ist schwerer verdaulich)', 'Fett wird erst im Dünndarm mit Galle und Lipase verdaut'], 'Ölsardinen sind sehr fettreich. Fett ist schwer verdaulich und bleibt deshalb viel länger im Magen. Verdaut wird es erst im Dünndarm, mit Galle und Lipase.'),
+  ],
+  leber: [
+    CLOZE('Lückentext zu Seite 6 (Leber)', 'Die Leber ist die größte {Drüse} und wird als {Stoffwechselzentrum} bezeichnet. Sie produziert die {Gallenflüssigkeit|Galle}. Sie nimmt die verdauten Nährstoffe aus dem {Blut} auf und baut daraus Fette, Eiweiße und {Glykogen} auf. Sie baut Giftstoffe wie {Alkohol} und alte rote {Blutkörperchen} ab. Außerdem bildet sie {Blutgerinnungsfaktoren|Gerinnungsfaktoren} und speichert {Eisen} und Vitamin A.', ['Insulin', 'Pepsin', 'Wasser']),
+    CLOZE('Lückentext zu Seite 7 (Galle und Bauchspeicheldrüse)', 'Die Galle wird in der {Leber} gebildet und in der {Gallenblase} gespeichert. Über den {Gallengang} gelangt sie in den {Zwölffingerdarm}. Sie zerkleinert Fette in kleine Fetttropfen, sie {emulgiert} sie. Die Bauchspeicheldrüse bildet die Enzyme {Amylase}, {Trypsin} und {Lipase} und die Hormone {Insulin} und {Glucagon|Glukagon}.', ['Pepsin', 'Maltose', 'Magen']),
+    F('Über welchen Gang gelangt die Galle in den Zwölffingerdarm?', 'Gallengang', ['über den Gallengang', 'Gallengänge'], ['Speiseröhre', 'Pfortader', 'Lymphgefäß'], 'Auch der Gang der Bauchspeicheldrüse mündet in den Gallengang.'),
+    F('Welche Speicherform der Glucose baut die Leber auf?', 'Glykogen', ['Glycogen'], ['Stärke', 'Maltose', 'Cellulose'], 'Glykogen = tierische Stärke, gespeichert in Leber und Muskeln.'),
+    MULTI('Was speichert die Leber?', ['Eisen', 'Vitamin A'], ['Galle', 'Insulin', 'Salzsäure']),
+    TF('Laut Seite 7 kommen Enzyme aus der Bauchspeicheldrüse und aus der Gallenblase. Stimmt das für die Gallenblase?', false, 'Die Gallenblase liefert keine Enzyme, nur die Galle (emulgiert Fette). Die Enzyme kommen aus der Bauchspeicheldrüse (und der Dünndarmschleimhaut).'),
+    MC('Wie schwer ist die Leber eines Erwachsenen?', '1,5–2 kg', ['150–200 g', '5–6 kg', '15–20 kg']),
+    F('Was bedeutet „alkalisch“?', 'pH-Wert über 7', ['über 7', 'pH über 7', 'basisch', 'größer als 7', 'pH-Wert größer als 7'], ['pH-Wert unter 7', 'pH-Wert genau 2', 'sehr sauer'], 'Alkalisch (basisch) = pH über 7. Sauer = unter 7.'),
+    EXPLAIN('Nenne vier Aufgaben der Leber.', ['Galle bilden', 'Nährstoffe aufnehmen und daraus Fette, Eiweiße, Glykogen aufbauen', 'Entgiftung: Alkohol, Medikamente, alte rote Blutkörperchen abbauen', 'Blutgerinnungsfaktoren bilden', 'Eisen und Vitamin A speichern'], 'Die Leber bildet die Galle, baut aus den Nährstoffen körpereigene Fette, Eiweiße und Glykogen auf, entgiftet (Alkohol, Medikamente, alte rote Blutkörperchen), bildet Blutgerinnungsfaktoren und speichert Eisen und Vitamin A.'),
+  ],
+  duenndarm: [
+    CLOZE('Lückentext zu Seite 7 (Dünndarm)', 'Der Dünndarm ist der {längste} Abschnitt des Verdauungstraktes. Er beginnt mit dem {Zwölffingerdarm}, der rund 30 cm lang ist. Dort münden die Verdauungssäfte der {Bauchspeicheldrüse|Pankreas} und der {Leber} ein.', ['Magen', 'kürzeste', 'Milz']),
+    CLOZE('Lückentext zu Seite 8 (Aufnahme ins Blut)', 'Die Bestandteile aus den Blutgefäßen gelangen über die {Pfortader} in die {Leber}. Das Lymphgefäßsystem ist über die obere {Hohlvene} mit dem Blutkreislauf verbunden. Daher gelangen auch die {Fette} wieder ins Blut.', ['Aorta', 'Galle', 'Lunge']),
+    F('Wie heißen die Falten der Dünndarm-Innenwand?', 'Ringfalten', ['Kerckring-Falten', 'Kerckringfalten', 'Falten', 'Kerckring Falten'], ['Mikrovilli', 'Krypten', 'Haustren'], 'Ringfalten (Kerckring-Falten) tragen die Darmzotten.'),
+    F('Über welche Vene gelangt die Lymphe (mit den Fetten) ins Blut?', 'obere Hohlvene', ['Hohlvene', 'die obere Hohlvene', 'obere Hohlvene'], ['Pfortader', 'Aorta', 'Lungenvene'], 'Das Lymphsystem mündet in die obere Hohlvene.'),
+    MC('Wie groß ist laut Heft die innere Oberfläche des Dünndarms ungefähr?', 'ca. 1 Tennisplatz', ['ca. 1 Blatt Papier', 'ca. 1 Tischtennisplatte', 'ca. 1 Fußballstadion'], 'Neuere Messungen kommen auf ca. 30–40 m². Im Heft steht „Tennisplatz“.'),
+    TF('Die Mikrovilli sitzen auf den Darmzellen der Zotten und bilden den Bürstensaum.', true),
+    MATCH('Seite 8, Abbildung 2: Was ist was?', [['a', 'Darmzotten'], ['b', 'Mikrovilli'], ['c', 'Blutgefäße'], ['d', 'Lymphgefäß']]),
+  ],
+  abbau: [
+    MATCH('Seite 8, Abbildung 1: Welches Symbol ist was?', [['ein Ring', 'Glucose'], ['zwei Ringe', 'Maltose'], ['lange Ringkette', 'Stärke'], ['eine Perle', 'Aminosäure'], ['kurze Perlenkette', 'Oligopeptid']]),
+    MATCH('Fett zerlegt: Was ist was?', [['kurzer „Rücken“ des Fettes', 'Glycerin'], ['lange „Zinken“', 'Fettsäuren'], ['Rücken + 3 Zinken', 'Fett']]),
+    ORDER('Fett-Abbau: Bring in die richtige Reihenfolge.', ['Fett', 'Galle emulgiert zu Fetttröpfchen', 'Lipase spaltet', 'Glycerin + Fettsäuren', 'Lymphe']),
+    SORT('Welches Enzym arbeitet wo?', ['Mund', 'Magen', 'Dünndarm'], [['Amylase (Speichel)', 0], ['Pepsin', 1], ['Maltase', 2], ['Lipase', 2], ['Trypsin', 2], ['Peptidasen', 2]]),
+    F('Welcher Nährstoff liefert pro Gramm die meiste Energie?', 'Fett', ['Fette'], ['Kohlenhydrate', 'Eiweiß', 'Wasser'], 'Fett: ca. 39 kJ/g, Kohlenhydrate und Eiweiß: ca. 17 kJ/g.'),
+  ],
+  zoeliakie: [
+    CLOZE('Lückentext zu Seite 9 (Zöliakie)', 'Zöliakie ist eine {Glutenunverträglichkeit}. Sie hat Merkmale einer {Allergie} und einer {Autoimmunerkrankung}. Gluten ist ein {Klebereiweiß|Klebereiweiss}. Glutenhaltige Nahrung verursacht eine {Entzündung} der Dünndarmschleimhaut. Deshalb werden die Nährstoffe nur schlecht {aufgenommen}.', ['Enzym', 'Laktose', 'Leber']),
+    CLOZE('Lückentext zu Seite 10 (Intoleranz)', 'Eine Intoleranz ist ein angeborener oder erworbener {Enzymdefekt}. Häufig sind die Laktose-, die {Fruktose|Fructose}- und die {Histaminintoleranz|Histamin}. Ein Enzymmangel verursacht Blähungen, Krämpfe, {Durchfall} oder Verstopfung. Eine Allergie ist eine Überreaktion des {Immunsystems}.', ['Hormon', 'Galle', 'Zotten']),
+    MULTI('Welche Beschwerden verursacht ein Enzymmangel (Intoleranz) im Darm?', ['Blähungen', 'Krämpfe', 'Durchfall', 'Verstopfung'], ['Schnupfen', 'Sonnenbrand']),
+    F('Was bedeutet DAO?', 'Diaminoxidase', ['Diamin-Oxidase', 'Diaminooxidase'], ['Darm-Amylase-Oxid', 'Doppel-Aminosäure', 'Dünndarm-Abwehr-Organ'], 'Die Diaminoxidase baut Histamin ab. Bei Histaminintoleranz fehlt sie (oder es ist zu wenig).'),
+    MC('Was ist die Laktose?', 'Milchzucker', ['Fruchtzucker', 'Malzzucker', 'Klebereiweiß']),
+  ],
+  dickdarm: [
+    CLOZE('Lückentext zu Seite 11', 'Der Dickdarm ist ca. 1,5 m lang und hat keine {Zotten}. An der Einmündung des Dünndarms liegt der sackartige {Blinddarm} mit dem {Wurmfortsatz}. Im Dickdarm werden keine Nährstoffe mehr aufgenommen, sondern nur {Wasser} und {Elektrolyte} zurückgewonnen. Der Kot gelangt in den {Mastdarm|Enddarm}, löst einen {Stuhldrang} aus und wird durch den {After} ausgeschieden. Die {Darmflora} baut für uns unverdauliche Stoffe wie {Cellulose|Zellulose} ab.', ['Glucose', 'Lipase', 'Pförtner']),
+    MC('Welchen Durchmesser hat der Dickdarm?', '5–8 cm', ['2,5 cm', '0,5 cm', '30 cm']),
+    MC('Wie lang ist der Wurmfortsatz ungefähr?', 'ca. 10 cm', ['ca. 1 cm', 'ca. 1 m', 'ca. 5 m']),
+    F('Was löst der Kot im Mastdarm aus?', 'Stuhldrang', ['den Stuhldrang'], ['Sodbrennen', 'Magenknurren', 'Schluckreflex'], 'Danach wird er über den After ausgeschieden.'),
+    F('Was verschließt den After im Ruhezustand?', 'Schließmuskel', ['Schliessmuskel', 'ein Schließmuskel'], ['Kehldeckel', 'Pförtner', 'Wurmfortsatz'], 'Der Schließmuskel hält den After geschlossen.'),
+    MULTI('Wer gehört zur Darmflora?', ['Bakterien', 'Archaeen', 'Einzeller'], ['Viren aus der Luft', 'Darmzotten']),
+    MC('Wie viel Darmgas verlässt täglich durch den After den Körper?', '0,5–1,5 Liter', ['ein paar Tropfen', '10–15 Liter', '100 Liter']),
+    TF('Ein Teil der Darmgase gelangt über das Blut in die Lunge und wird ausgeatmet.', true),
+    Object.assign(EXPLAIN('Bei der Blinddarmoperation wird nicht der Blinddarm, sondern nur der Wurmfortsatz, eine ca. 10 cm lange Ausstülpung am Dickdarm, entfernt. Welche Funktion hat der Wurmfortsatz?', ['Er enthält viele Lymphknoten', 'Er hilft bei der Immunabwehr', 'Kann ohne wesentliche Folgen entfernt werden'], 'Der Wurmfortsatz enthält viele Lymphknoten und hilft bei der Immunabwehr. Ein entzündeter Wurmfortsatz kann trotzdem ohne wesentliche Folgen entfernt werden, weil es noch viele weitere Lymphknoten zwischen den Gedärmen gibt.'), { heft: 'Seite 11, Aufgabe a' }),
+  ],
+  enzyme: [
+    CLOZE('Lückentext zu Seite 7: Die Abbauwege', 'Stärke wird durch die {Amylase} in Maltose gespalten und durch die {Maltase} weiter zu Glucose abgebaut. Proteine werden durch {Peptidasen} (z. B. {Trypsin}) in {Aminosäuren} zerlegt. Fette werden durch den {Gallensaft|Galle} emulgiert und durch die {Lipase} zu {Fettsäuren} und {Glycerin} zerlegt.', ['Pepsinogen', 'Insulin', 'Laktose']),
+    F('Wie heißt die inaktive Vorstufe von Pepsin?', 'Pepsinogen', [], ['Trypsin', 'Pepsinase', 'Salzsäure'], 'Pepsinogen aus den Hauptzellen wird durch Salzsäure zu Pepsin.'),
+    F('Welches Enzym spaltet Stärke zu Maltose?', 'Amylase', [], ['Maltase', 'Lipase', 'Pepsin'], 'Amylase: in Mundspeichel und Bauchspeichel.'),
+    MC('Welches Enzym kommt sowohl im Mund als auch aus der Bauchspeicheldrüse?', 'Amylase', ['Pepsin', 'Maltase', 'Laktase']),
+    MULTI('Welche Enzyme spalten Proteine bzw. Peptide?', ['Pepsin', 'Trypsin', 'Peptidasen'], ['Amylase', 'Lipase', 'Maltase']),
+  ],
+  neuron: [
+    { t: 'pick', heft: 'Arbeitsblatt, Aufgabe 1', d: 'neuron', q: 'Zeichne die Richtung der Reizleitung ein: In welche Richtung läuft die Reizleitung in dieser Nervenzelle?', a: '← nach links: von den Dendriten (7) zu den Endknöpfchen (1)', wrong: ['→ nach rechts: von den Endknöpfchen (1) zu den Dendriten (7)'], ex: 'Dendriten empfangen, das Axon leitet weiter, an den Endknöpfchen wird übertragen.' },
+    MATCH('Funktionen (Teil 1): Was macht welcher Teil?', [['Dendriten', 'empfangen Signale'], ['Zellkörper', 'Stoffwechselzentrum'], ['Zellkern', 'Steuerzentrale'], ['Axonhügel', 'hier startet das Aktionspotenzial']]),
+    MATCH('Funktionen (Teil 2): Was macht welcher Teil?', [['Axon', 'leitet Impulse weiter'], ['Schwann’sche Zelle', 'bildet die Myelinscheide'], ['Ranvier’scher Schnürring', 'Impuls springt → schnell'], ['Endknöpfchen', 'Kontakt zu anderen Zellen'], ['Synapse', 'überträgt die Information']]),
+    CLOZE('Lückentext: Aufbau und Funktion', 'Die {Dendriten} empfangen Signale. Der {Zellkörper} ist das Stoffwechselzentrum, der {Zellkern} die Steuerzentrale. Am {Axonhügel} wird das Aktionspotenzial ausgelöst. Das {Axon} leitet die Impulse weiter. Die {Schwann’schen Zellen|Schwannschen Zellen|Gliazellen} bilden die isolierende {Myelinscheide|Markscheide}. Die Lücken dazwischen heißen {Ranvier’sche Schnürringe|Ranviersche Schnürringe|Schnürringe}. Die {Endknöpfchen} übertragen das Signal an der {Synapse} auf die nächste Zelle.', ['Mikrovilli', 'Pepsin', 'Zotten']),
+    F('Wie heißt die isolierende Schicht um das Axon?', 'Myelinscheide', ['Markscheide', 'Myelin'], ['Zellmembran', 'Bürstensaum', 'Schleim'], 'Myelinscheide = Markscheide, gebildet von den Schwann’schen Zellen.'),
+    MULTI('Mit welchen Zellen nehmen die Endknöpfchen Kontakt auf?', ['Nervenzellen', 'Muskelzellen', 'Drüsenzellen'], ['rote Blutkörperchen', 'Darmzotten']),
+    F('Was muss am Axonhügel überschritten werden, damit ein Aktionspotenzial entsteht?', 'Schwellenwert', ['der Schwellenwert', 'Schwelle'], ['Siedepunkt', 'pH-Wert', 'Blutdruck'], 'Nur wenn der Reiz stark genug ist (Schwellenwert), startet das Aktionspotenzial.'),
+    F('Was enthält der Zellkörper zum großen Teil?', 'Zellorganellen', ['Organellen', 'die Zellorganellen'], ['Organe', 'Mikrovilli', 'Enzyme der Verdauung'], 'Achtung: Organellen, nicht Organe.'),
+    EXPLAIN('Erkläre, warum die Reizleitung an einem Axon mit Myelinscheide besonders schnell ist.', ['Die Myelinscheide (Schwann’sche Zellen) isoliert das Axon', 'An den Ranvier’schen Schnürringen ist das Axon frei', 'Der Impuls springt von Schnürring zu Schnürring'], 'Die Schwann’schen Zellen bilden um das Axon eine isolierende Myelinscheide. Nur an den Lücken, den Ranvier’schen Schnürringen, liegt das Axon frei. Der Impuls springt deshalb von Schnürring zu Schnürring und muss nicht das ganze Axon entlanglaufen. Das ist viel schneller.'),
+    EXPLAIN('Beschreibe den Weg eines Signals durch die Nervenzelle (mit Fachbegriffen).', ['Dendriten empfangen das Signal', 'über den Zellkörper zum Axonhügel, dort startet das Aktionspotenzial', 'Axon leitet weiter (springt von Schnürring zu Schnürring)', 'Endknöpfchen geben es an der Synapse an die nächste Zelle weiter'], 'Die Dendriten empfangen das Signal von anderen Nervenzellen. Es läuft über den Zellkörper zum Axonhügel. Wird dort der Schwellenwert überschritten, entsteht ein Aktionspotenzial. Das Axon leitet den Impuls weiter, dabei springt er von Schnürring zu Schnürring. An den Endknöpfchen wird die Information über die Synapse auf die nächste Zelle übertragen.'),
+  ],
+};
+for (const ch of CHAPTERS) if (EXTRA[ch.id]) ch.q.push(...EXTRA[ch.id]);
+
+
+/* ---------- tasks printed in the booklet, in their exact wording ---------- */
+const HEFT = {
+  mund: [
+    Object.assign(EXPLAIN('Gib jeweils die Funktionen der Zähne an (Schneidezähne, Eckzähne, Backenzähne, Mahlzähne, Weisheitszähne).', ['Schneidezähne: abbeißen und abschneiden', 'Eckzähne: festhalten und abreißen (Relikt der Reißzähne)', 'Backenzähne (Prämolaren): Kaufläche mit 2 Höckern, zerkleinern', 'Mahlzähne (Molaren): Kaufläche mit mehreren Höckern, zermahlen', 'Weisheitszähne: die hintersten Mahlzähne, Überbleibsel der Entwicklung'], 'Schneidezähne (Incisivi): zum Abbeißen und Abschneiden. Eckzähne (Canini): zum Festhalten und Abreißen, ein Relikt der Reißzähne, mit denen Tiere ihre Beute reißen. Backenzähne (Prämolaren): Kaufläche mit 2 Höckern, zum Zerkleinern und Zermahlen. Mahlzähne (Molaren): Kaufläche mit mehreren Höckern, zum Zermahlen. Weisheitszähne: die dritten, hintersten Mahlzähne, ein Überbleibsel aus der Entwicklung des Menschen.'), { heft: 'Seite 3, Aufgabe A', key: 'h-zahnfunktion' }),
+  ],
+  magen: [
+    Object.assign(EXPLAIN('Stelle in einem Diagramm die Aufgaben der Hauptzellen, Nebenzellen und Belegzellen des Magens dar.', ['Hauptzellen → bilden Pepsinogen (inaktive Vorstufe von Pepsin)', 'Nebenzellen → bilden Magenschleim: schützt die Magenwand vor Salzsäure und Selbstverdauung', 'Belegzellen → bilden Salzsäure (pH 2): tötet Bakterien, lässt Nahrung aufquellen, wandelt Pepsinogen in Pepsin um'], 'Diagramm (z. B. drei Kästchen mit Pfeilen): Hauptzellen → Pepsinogen → (durch Salzsäure) → Pepsin spaltet Proteine zu Peptiden. Nebenzellen → Schleim → schützt die Magenwand vor Salzsäure und Selbstverdauung. Belegzellen → Salzsäure (pH 2) → tötet Bakterien, lässt die Nahrung aufquellen, aktiviert Pepsinogen zu Pepsin.'), { heft: 'Seite 5, Aufgabe b', key: 'h-magenzellen' }),
+  ],
+  leber: [
+    Object.assign(LABEL('leber', ['arterie', 'gallenblase', 'pfortader', 'leber', 'vene', 'bauchspeicheldruese'], 'Beschrifte die Abbildung 1 mit folgenden Begriffen: Arterie, Gallenblase, Pfortader, Leber, Vene, Bauchspeicheldrüse.'), { heft: 'Seite 6, Aufgabe', key: 'h-leberbild' }),
+  ],
+  duenndarm: [
+    Object.assign(EXPLAIN('Die innere Oberfläche des Dünndarms ist sehr groß. Durch welche besonderen Strukturen kommt dies zu Stande und welche Vorteile hat es für einen Menschen?', ['Strukturen: Falten (Ringfalten), Darmzotten, Mikrovilli (Bürstensaum)', 'Vorteil: große Kontaktfläche', 'Dadurch können viel mehr Nährstoffe schnell ins Blut und in die Lymphe aufgenommen werden'], 'Die große Oberfläche entsteht durch die Falten der Dünndarmwand (Ringfalten), die vielen Darmzotten darauf und die winzigen Mikrovilli auf den Darmzellen (Bürstensaum). Der Vorteil: Die Kontaktfläche ist riesig (laut Heft etwa ein Tennisplatz), deshalb können sehr viele Nährstoffe in kurzer Zeit ins Blut und in die Lymphe aufgenommen werden.'), { heft: 'Seite 10, Aufgabe a', key: 'h-oberflaeche' }),
+  ],
+  zoeliakie: [
+    Object.assign(EXPLAIN('Informiere dich: Welche Enzyme fehlen Menschen mit einer Laktose-, Fruktose- oder Histaminintoleranz?', ['Laktoseintoleranz: Laktase', 'Histaminintoleranz: DAO (Diaminoxidase)', 'Erbliche Fruktoseintoleranz: Aldolase B'], 'Bei der Laktoseintoleranz fehlt die Laktase. Bei der Histaminintoleranz fehlt die DAO (Diaminoxidase) oder es ist zu wenig davon da. Bei der erblichen Fruktoseintoleranz fehlt die Aldolase B. (Ein Enzym „Fruktase“ gibt es nicht.)'), { heft: 'Seite 10, Informiere dich a', key: 'h-intoleranz' }),
+  ],
+  neuron: [
+    Object.assign(EXPLAIN('Ergänze die Funktionen der Bestandteile eines Neurons in der Tabelle (1 bis 9).', ['1 Endknöpfchen: Kontakt zu Nerven-, Muskel- oder Drüsenzellen · 2 Synapse: überträgt die Information auf die Zielzelle', '3 Schwann’sche Zelle (Gliazelle): bildet die isolierende Myelinscheide · 4 Axon: leitet die Impulse weiter', '5 Ranvier’scher Schnürring: der Impuls springt von Schnürring zu Schnürring (schnell) · 6 Axonhügel: hier startet das Aktionspotenzial', '7 Dendriten: empfangen Signale · 8 Zellkörper: Stoffwechselzentrum · 9 Zellkern: Steuerzentrale'], '1 Endknöpfchen: nehmen Kontakt mit Nerven-, Muskel- oder Drüsenzellen auf. 2 Synapse: Hier wird die Information auf die Zielzelle übertragen. 3 Schwann’sche Zelle (Gliazelle): bildet die isolierende Schicht (Myelinscheide). 4 Axon: leitet die Impulse zu anderen Zellen weiter. 5 Ranvier’scher Schnürring: wichtig für die schnelle Weiterleitung, der Impuls springt von Schnürring zu Schnürring. 6 Axonhügel: Hier wird das Aktionspotenzial ausgelöst, wenn der Schwellenwert überschritten wird. 7 Dendriten: empfangen Signale von anderen Nervenzellen. 8 Zellkörper: Stoffwechselzentrum, enthält den Großteil der Zellorganellen. 9 Zellkern: Steuerzentrale der Nervenzelle.'), { heft: 'Arbeitsblatt, Aufgabe 2', key: 'h-neuronfunktion' }),
+  ],
+};
+for (const ch of CHAPTERS) if (HEFT[ch.id]) ch.q.push(...HEFT[ch.id]);
+
+
+/* ---------- Seite 8: both figures exactly like the booklet ---------- */
+const PAGE8 = {
+  abbau: [
+    Object.assign(LABEL('seite8abb1', ['fettsaeuren', 'glycerin', 'proteine', 'oligopeptide', 'aminosaeuren', 'staerke', 'maltose', 'glucose', 'blutgefaess8', 'lymphgefaess8'], 'Benenne die Teilchen und Gefäße in Abbildung 1 von Seite 8.'), { heft: 'Seite 8, Abbildung 1', key: 'p8-abb1' }),
+    { t: 'pick', d: 'seite8abb1', markers: false, heft: 'Seite 8, Abbildung 1', key: 'p8-fett', q: 'Abbildung 1: Wohin gelangen die Fettsäuren und das Glycerin?', a: 'ins Lymphgefäß (grüne Pfeile)', wrong: ['ins Blutgefäß (rote Pfeile)', 'sie bleiben im Dünndarm', 'in den Magen zurück'], ex: 'Die Fettbausteine gehen in die Lymphe und über die obere Hohlvene später ins Blut.' },
+    { t: 'pick', d: 'seite8abb1', markers: false, heft: 'Seite 8, Abbildung 1', key: 'p8-blut', q: 'Abbildung 1: Welche Bausteine gelangen ins Blutgefäß?', a: 'Glucose und Aminosäuren', wrong: ['Fettsäuren und Glycerin', 'Stärke und Proteine', 'Maltose und Oligopeptide'], ex: 'Nur die kleinsten Bausteine passen durch die Darmwand: Glucose und Aminosäuren ins Blut (rote Pfeile).' },
+    { t: 'pick', d: 'seite8abb1', markers: false, heft: 'Seite 8, Abbildung 1', key: 'p8-warum', q: 'Abbildung 1: Warum werden die Nährstoffe im Dünndarm so klein zerlegt?', a: 'Nur die kleinsten Bausteine können durch die Darmwand ins Blut und in die Lymphe', wrong: ['Damit sie im Darm besser schmecken', 'Damit der Dickdarm sie wieder zusammenbauen kann', 'Weil große Teilchen sofort ins Blut gehen'], ex: 'Nährstoffe müssen in kleinste Bausteine zerlegt werden, damit sie über die Blutgefäße in alle Bereiche des Körpers gelangen können.' },
+    Object.assign(EXPLAIN('Erkläre mithilfe der Abbildung 1 (Seite 8), was im Dünndarm mit Fetten, Proteinen und Kohlenhydraten passiert und wohin die Bausteine gelangen.', ['Kohlenhydrate (Stärke) → Maltose → Glucose → ins Blutgefäß', 'Proteine → Oligopeptide → Aminosäuren → ins Blutgefäß', 'Fette → Glycerin + Fettsäuren → ins Lymphgefäß', 'Nur kleinste Bausteine passen durch die Darmwand; Blut → Pfortader → Leber, Lymphe → obere Hohlvene → Blut'], 'Im Dünndarm zerlegen Enzyme die großen Nährstoffe Schritt für Schritt: Stärke wird über Maltose zu Glucose, Proteine über Oligopeptide zu Aminosäuren, Fette zu Glycerin und Fettsäuren. Nur diese kleinsten Bausteine passen durch die Darmwand. Glucose und Aminosäuren gelangen ins Blutgefäß und über die Pfortader zur Leber. Fettsäuren und Glycerin gelangen ins Lymphgefäß und über die obere Hohlvene später ebenfalls ins Blut.'), { heft: 'Seite 8, Abbildung 1', key: 'p8-erkl' }),
+  ],
+  duenndarm: [
+    Object.assign(LABEL('seite8abb2', ['darmzotte', 'mikrovilli', 'blutgefaess', 'lymphgefaess'], 'Beschrifte Abbildung 2 (a bis d).'), { heft: 'Seite 8, Aufgabe a', key: 'p8-abb2' }),
+  ],
+};
+for (const ch of CHAPTERS) if (PAGE8[ch.id]) ch.q.push(...PAGE8[ch.id]);
+
+/* ---------- the worksheets page by page: topics (Prüfstoff-Check) and the tasks printed on each page ---------- */
+const R = (ref) => ({ ref });
+const K = (key) => ({ key });
+export const WORKSHEETS = [
+  { page: 'Seite 2', title: 'Was ist Verdauung? · Übersicht Verdauungsorgane', ch: 'ueberblick',
+    topics: ['Verdauung = mechanische + chemische Zerlegung', 'Makromoleküle → Grundbausteine (z. B. Proteine → Aminosäuren)', 'Verdauungsenzyme', 'Verdauungsorgane und Weg der Nahrung', 'Enzymatischer Abbau: Mundhöhle bis Dünndarm', 'Dickdarm: Wasser wird resorbiert, Kot', 'Abbildung: Übersicht Verdauungsorgane beschriften (inkl. 3 Speicheldrüsen)'],
+    tasks: [R('ueberblick-0'), R('ueberblick-1'), R('ueberblick-2'), R('ueberblick-11'), R('ueberblick-12'), R('ueberblick-6'), R('ueberblick-10')] },
+  { page: 'Seite 3', title: 'Die Mundhöhle · Zähne', ch: 'mund',
+    topics: ['Zähne zerkleinern, Speichel macht gleitfähig', '1–1,5 l Speichel pro Tag', '3 große Speicheldrüsen', 'Amylase: Stärke → Maltose (2 × Glucose)', 'Aufgabe A: Milchgebiss + Dauergebiss beschriften, Funktionen der Zähne'],
+    tasks: [R('mund-21'), R('mund-0'), R('mund-19'), K('h-zahnfunktion'), R('mund-20'), R('mund-6'), R('mund-22'), R('mund-23'), R('mund-1'), R('mund-3'), R('mund-4')] },
+  { page: 'Seite 4', title: 'Zahnformeln · Speiseröhre', ch: 'mund',
+    topics: ['Aufgabe B: Zahnformeln (Dauergebiss 32, Milchgebiss 20)', 'Latein: Incisivi, Canini, Prämolaren, Molaren', 'Wusstest du: Streptokokken und Karies', 'Speiseröhre: >20 Muskeln + Kehldeckel', 'Peristaltik, keine Verdauung', 'Schließmuskel = Ventil', 'Nachweis der Peristaltik (Kopfstand)'],
+    tasks: [R('mund-17'), R('mund-18'), R('mund-7'), R('mund-15'), R('mund-12'), R('mund-24'), R('mund-26'), R('mund-16')] },
+  { page: 'Seite 5', title: 'Der Magen', ch: 'magen',
+    topics: ['Mageneingang (Magenmund), Magenausgang (Pförtner)', 'speichern, verdauen, durchkneten', '2 l Magensaft: Salzsäure, Schleim, Enzyme', 'Belegzellen, Hauptzellen, Nebenzellen', 'Pepsinogen → Pepsin; Proteine → Peptide', 'Abbildung 13 a + b beschriften', 'Aufgabe a: Fassungsvermögen 1,5–2 l', 'Aufgabe b: Aufgaben der drei Zellarten'],
+    tasks: [R('magen-0'), R('magen-1'), R('magen-19'), R('magen-14'), R('magen-2'), K('h-magenzellen'), R('magen-20'), R('magen-11'), R('magen-16')] },
+  { page: 'Seite 6', title: 'Sodbrennen · Leber', ch: 'leber',
+    topics: ['Aufgabe c: Sodbrennen', 'Wusstest du: Verweildauer im Magen, Magenknurren', 'Leber: größte Drüse, 1,5–2 kg, zweilappig, Stoffwechselzentrum', 'Galle bilden; Fette, Eiweiße, Glykogen aufbauen', 'Entgiftung, Gerinnungsfaktoren, Eisen, Vitamin A', 'Aufgabe: Abbildung 1 beschriften (Arterie, Gallenblase, Pfortader, Leber, Vene, Bauchspeicheldrüse)'],
+    tasks: [R('magen-18'), R('magen-21'), R('magen-22'), R('magen-25'), K('h-leberbild'), R('leber-0'), R('leber-15'), R('leber-23')] },
+  { page: 'Seite 7', title: 'Gallenblase und Bauchspeicheldrüse · Dünndarm', ch: 'leber',
+    topics: ['Galle: Leber → Gallenblase → Gallengang → Zwölffingerdarm', 'Galle emulgiert Fette (kein Enzym)', 'Bauchspeicheldrüse: Amylase, Trypsin, Lipase', 'Hormone Insulin und Glucagon', 'Brei wird alkalisch (pH > 7)', 'Abbau: Stärke, Proteine, Fette', 'Dünndarm 5–6 m, Zwölffingerdarm ~30 cm'],
+    tasks: [R('leber-16'), R('leber-20'), R('leber-7'), R('leber-12'), R('enzyme-20'), R('duenndarm-13'), R('leber-6')] },
+  { page: 'Seite 8', title: 'Wie gelangt die Nahrung in alle Körperregionen?', ch: 'abbau',
+    topics: ['Nährstoffe müssen in kleinste Bausteine zerlegt werden', 'Ringfalten, Darmzotten, Kapillaren, Lymphgefäße', 'Mikrovilli bilden den Bürstensaum', 'Blut → Pfortader → Leber', 'Lymphe → obere Hohlvene → Blut (Fette)', 'Abbildung 1: Vorgänge bei der Verdauung (die Katzen-Stelle), mit Erklärung wie man sie liest', 'Aufgabe a: Abbildung 2 beschriften (a Darmzotten, b Mikrovilli, c Blutgefäße, d Lymphgefäß)'],
+    tasks: [K('p8-abb1'), K('p8-blut'), K('p8-fett'), K('p8-warum'), K('p8-erkl'), R('abbau-14'), R('abbau-1'), R('abbau-2'), R('abbau-8'), K('p8-abb2'), R('duenndarm-11'), R('duenndarm-14')] },
+  { page: 'Seite 9', title: 'Dünndarm: Erläuterungen · Exkurs Zöliakie', ch: 'duenndarm',
+    topics: ['Aufgabe b: Vorgänge bei der Verdauung im Dünndarm erläutern', 'Aufgabe c: Bedeutung der Darmzotten, Oberflächenvergrößerung (ca. 1 Tennisplatz)', 'Zöliakie: Glutenunverträglichkeit (Allergie + Autoimmun)', 'Gluten = Klebereiweiß, Entzündung der Schleimhaut', 'Symptome', 'Abbildung: Bau des Dünndarms (Muskulatur, Kerckring-Falten, Zotte, Krypte …)'],
+    tasks: [R('abbau-13'), R('duenndarm-12'), R('duenndarm-15'), R('duenndarm-17'), R('zoeliakie-9'), R('zoeliakie-0'), R('duenndarm-0')] },
+  { page: 'Seite 10', title: 'Zöliakie im Vergleich · Intoleranz', ch: 'zoeliakie',
+    topics: ['Aufgabe a: Große Oberfläche durch Falten, Zotten, Mikrovilli', 'Aufgabe b: Zöliakie vs. gesund, Symptome erklären', 'Intoleranz ≠ Allergie', 'Laktose-, Fruktose-, Histaminintoleranz', 'Informiere dich: Laktase, DAO, Aldolase B'],
+    tasks: [K('h-oberflaeche'), R('zoeliakie-8'), R('zoeliakie-10'), R('zoeliakie-4'), K('h-intoleranz'), R('zoeliakie-6'), R('zoeliakie-11')] },
+  { page: 'Seite 11', title: 'Der Dickdarm', ch: 'dickdarm',
+    topics: ['1,5 m, keine Zotten, Durchmesser 5–8 cm', 'Blinddarm mit Wurmfortsatz (10 cm)', 'Wasser + Elektrolyte zurück, Kot, Mastdarm, After, Schließmuskel', 'Darmflora baut Cellulose ab', 'Wusstest du: Gase', 'Aufgabe a: Funktion des Wurmfortsatzes', 'Aufgabe b: Wozu Darmbakterien?'],
+    tasks: [R('dickdarm-11'), R('dickdarm-1'), R('dickdarm-2'), R('dickdarm-19'), R('dickdarm-10'), R('dickdarm-8')] },
+  { page: 'Arbeitsblatt', title: 'Aufbau und Funktion eines Neurons', ch: 'neuron',
+    topics: ['Aufgabe 1: Richtung der Reizleitung einzeichnen', 'Aufgabe 2: 9 Bestandteile beschriften', 'Funktionen in der Tabelle ergänzen'],
+    tasks: [R('neuron-15'), R('neuron-0'), K('h-neuronfunktion'), R('neuron-16'), R('neuron-17'), R('neuron-18'), R('neuron-3')] },
+];
+
 /* Attach stable ids to every question. */
 for (const ch of CHAPTERS) ch.q.forEach((q, i) => { q.id = `${ch.id}-${i}`; q.ch = ch.id; });
 export const chapterById = (id) => CHAPTERS.find((c) => c.id === id);
 export const ALL_QUESTIONS = CHAPTERS.flatMap((c) => c.q);
+for (const w of WORKSHEETS) for (const t of w.tasks) if (t.key) t.ref = ALL_QUESTIONS.find((q) => q.key === t.key).id;
 
 /* ---------- Steckbrief-Karten (Quartett style): compact facts per organ / enzyme / part ---------- */
 export const CARDS = {
   ueberblick: [
-    { t: 'Verdauung', ic: '🍽️', d: 'organe', hl: [], rows: [['Was?', 'große Nährstoffe → kleine Grundbausteine'], ['Mechanisch', 'Zähne zerkleinern, Magen knetet'], ['Chemisch', 'Enzyme spalten (wie Scheren)'], ['Beispiel', 'Proteine → Aminosäuren']], tip: 'Verdauung = zerkleinern + spalten' },
+    { t: 'Verdauung', ic: '🍽️', d: 'organe', hl: [], rows: [['Was?', 'Makromoleküle (große Nährstoff-Moleküle) → kleine Grundbausteine'], ['Mechanische Verdauung', 'Zähne zerkleinern, Magen knetet'], ['Chemische Verdauung', 'Verdauungsenzyme spalten (wie Scheren)'], ['Beispiel', 'Proteine → Aminosäuren'], ['Resorption', 'Aufnahme der Bausteine durch die Darmwand']], tip: 'Verdauung = zerkleinern + spalten' },
     { t: 'Weg der Nahrung', ic: '🗺️', d: 'organe', hl: ['speiseroehre', 'magen', 'duenndarm', 'dickdarm', 'mastdarm'], rows: [['1–3', 'Mund → Speiseröhre → Magen'], ['4–5', 'Dünndarm → Dickdarm'], ['6–7', 'Mastdarm → After'], ['Verdauung mit Enzymen', 'Mund, Magen, Dünndarm']], tip: 'Meine Süße Mieze Döst Den Mittag Ab' },
     { t: 'Helfer-Drüsen', ic: '🧪', d: 'organe', hl: ['ohrspeicheldruese', 'unterkieferspeicheldruese', 'unterzungenspeicheldruese', 'leber', 'gallenblase', 'bauchspeicheldruese'], rows: [['Speicheldrüsen', 'Speichel mit Amylase'], ['Leber + Gallenblase', 'Galle (emulgiert Fett)'], ['Bauchspeicheldrüse', 'Amylase, Trypsin, Lipase'], ['Besonders', 'keine Nahrung geht durch sie hindurch']], tip: 'Sie liefern Säfte in den Darm' },
   ],
   mund: [
     { t: 'Mundhöhle', ic: '👄', d: 'organe', hl: ['zaehne', 'zunge', 'ohrspeicheldruese', 'unterkieferspeicheldruese', 'unterzungenspeicheldruese'], rows: [['Speichel/Tag', '1–1,5 Liter'], ['Große Drüsen', 'Ohr-, Unterkiefer-, Unterzungenspeicheldrüse'], ['Enzym', 'Amylase'], ['spaltet', 'Stärke → Maltose']], tip: 'Lange gekautes Brot schmeckt süß' },
     { t: 'Dauergebiss', ic: '🦷', d: 'zaehne', hl: [], rows: [['Anzahl', '32 Zähne'], ['Zahnformel', '2-1-2-3 (I-C-P-M)'], ['Vorne → hinten', 'Schneide-, Eck-, Backen-, Mahlzähne'], ['Ganz hinten', 'Weisheitszähne']], tip: '2-1-2-3 → 32' },
-    { t: 'Milchgebiss', ic: '🍼', d: 'zaehne', hl: ['schneidezaehne', 'eckzaehne', 'mahlzaehne'], rows: [['Anzahl', '20 Zähne'], ['Zahnformel', '2-1-2 (I-C-M)'], ['Fehlt', 'keine Prämolaren (Backenzähne)']], tip: '2-1-2 → 20' },
+    { t: 'Milchgebiss', ic: '🍼', d: 'milchgebiss', hl: [], rows: [['Anzahl', '20 Zähne'], ['Zahnformel', '2-1-2 (I-C-M)'], ['Fehlt', 'keine Prämolaren (Backenzähne)']], tip: '2-1-2 → 20' },
     { t: 'Schneidezähne', ic: '✂️', d: 'zaehne', hl: ['schneidezaehne'], rows: [['Nr.', '1'], ['Latein', 'Incisivi (I)'], ['Aufgabe', 'abbeißen, abschneiden']] },
-    { t: 'Eckzähne', ic: '🐯', d: 'zaehne', hl: ['eckzaehne'], rows: [['Nr.', '2'], ['Latein', 'Canini (C)'], ['Aufgabe', 'festhalten, abreißen'], ['Bei Katzen', 'lange Fangzähne']] },
+    { t: 'Eckzähne', ic: '🐯', d: 'zaehne', hl: ['eckzaehne'], rows: [['Nr.', '2'], ['Latein', 'Canini (C)'], ['Aufgabe', 'festhalten, abreißen'], ['Herkunft', 'Relikt der Reißzähne, mit denen Tiere die Beute reißen'], ['Bei Katzen', 'lange Fangzähne']] },
     { t: 'Backenzähne', ic: '🔨', d: 'zaehne', hl: ['backenzaehne'], rows: [['Nr.', '3'], ['Latein', 'Prämolaren (P)'], ['Kaufläche', '2 Höcker'], ['Aufgabe', 'zerkleinern, zermahlen']] },
     { t: 'Mahlzähne', ic: '⚙️', d: 'zaehne', hl: ['mahlzaehne', 'weisheitszaehne'], rows: [['Nr.', '4 (5 = Weisheitszahn)'], ['Latein', 'Molaren (M)'], ['Kaufläche', 'mehrere Höcker'], ['Aufgabe', 'zermahlen']] },
-    { t: 'Speiseröhre', ic: '🛝', d: 'organe', hl: ['speiseroehre'], rows: [['Verdauung', 'keine, nur Transport'], ['Transport', 'Peristaltik (wellenförmig)'], ['Schutz', 'Kehldeckel schließt die Luftröhre'], ['Am Ende', 'Schließmuskel = Ventil']], tip: 'Schlucken geht sogar im Kopfstand' },
+    { t: 'Speiseröhre', ic: '🛝', d: 'organe', hl: ['speiseroehre'], rows: [['Schlucken', 'mehr als 20 Muskeln + Kehldeckel'], ['Verdauung', 'keine, nur Transport'], ['Transport', 'Peristaltik (wellenförmig)'], ['Schutz', 'Kehldeckel schließt die Luftröhre'], ['Am Ende', 'Schließmuskel = Ventil']], tip: 'Schlucken geht sogar im Kopfstand' },
   ],
   magen: [
-    { t: 'Magen', ic: '🫄', d: 'magen', hl: ['magen'], rows: [['Form', 'sackartig'], ['Fassungsvermögen', '1,5–2 Liter'], ['Magensaft/Tag', 'ca. 2 Liter'], ['Eingang / Ausgang', 'Magenmund / Pförtner'], ['Enzym', 'Pepsin (Proteine → Peptide)']], tip: 'speichern · kneten · verdauen' },
+    { t: 'Magen', ic: '🫄', d: 'magen', hl: ['magen'], rows: [['Form', 'sackartig'], ['Aufgaben', 'zwischenspeichern, durchkneten, verdauen'], ['Bereiche', 'oben Speicherraum, unten Zerkleinern und Mischen'], ['Fassungsvermögen', '1,5–2 Liter'], ['Magensaft/Tag', 'ca. 2 Liter'], ['Eingang / Ausgang', 'Magenmund / Pförtner'], ['Enzym', 'Pepsin (Proteine → Peptide)']], tip: 'speichern · kneten · verdauen' },
     { t: 'Belegzellen', ic: '🧯', d: 'schleimhaut', hl: ['belegzelle'], rows: [['bilden', 'Salzsäure (pH 2)'], ['Wirkung', 'tötet Bakterien, Nahrung quillt auf'], ['Extra', 'macht Pepsinogen → Pepsin']], tip: 'belegen alles mit Säure' },
     { t: 'Hauptzellen', ic: '✂️', d: 'schleimhaut', hl: ['hauptzelle'], rows: [['bilden', 'Pepsinogen'], ['Was ist das?', 'inaktive Vorstufe von Pepsin'], ['Warum inaktiv?', 'Schutz vor Selbstverdauung']], tip: 'machen die Hauptsache: das Enzym' },
     { t: 'Nebenzellen', ic: '🛡️', d: 'schleimhaut', hl: ['nebenzelle', 'schleim'], rows: [['bilden', 'Magenschleim'], ['Wirkung', 'schützt die Magenwand vor Säure und Selbstverdauung']], tip: 'schützen nebenbei mit Schleim' },
     { t: 'Sodbrennen', ic: '🔥', d: 'magen', hl: ['magenmund', 'speiseroehre'], rows: [['Was?', 'brennender Schmerz hinter dem Brustbein'], ['Warum?', 'Magensäure fließt in die Speiseröhre zurück'], ['Schuld', 'Schließmuskel am Magenmund schließt nicht dicht']] },
   ],
   leber: [
-    { t: 'Leber', ic: '🟤', d: 'leber', hl: ['leber'], rows: [['Gewicht', '1,5–2 kg, zweilappig'], ['Spitzname', 'Stoffwechselzentrum, größte Drüse'], ['bildet', 'Galle, Gerinnungsfaktoren'], ['baut auf', 'Fette, Eiweiße, Glykogen'], ['entgiftet', 'Alkohol, Medikamente'], ['speichert', 'Eisen, Vitamin A']], tip: 'bildet KEINE Verdauungsenzyme' },
+    { t: 'Leber', ic: '🟤', d: 'leber', hl: ['leber'], rows: [['Gewicht', '1,5–2 kg, zweilappig'], ['Spitzname', 'Stoffwechselzentrum, größte Drüse'], ['bildet', 'Galle, Blutgerinnungsfaktoren'], ['nimmt auf', 'verdaute Nährstoffe aus dem Blut (über die Pfortader)'], ['baut auf', 'Fette, Eiweiße, Glykogen'], ['Entgiftung', 'Alkohol, Medikamente, alte rote Blutkörperchen'], ['speichert', 'Eisen, Vitamin A']], tip: 'bildet KEINE Verdauungsenzyme' },
     { t: 'Pfortader', ic: '🚌', d: 'leber', hl: ['pfortader'], rows: [['von', 'Darm'], ['nach', 'Leber'], ['bringt', 'Glucose, Aminosäuren']] },
-    { t: 'Gallenblase & Galle', ic: '🧴', d: 'leber', hl: ['gallenblase'], rows: [['Galle gebildet in', 'Leber'], ['gespeichert in', 'Gallenblase'], ['fließt in', 'Zwölffingerdarm'], ['Wirkung', 'emulgiert Fette zu Tröpfchen'], ['Enzym?', 'NEIN']], tip: 'Galle = Spülmittel' },
+    { t: 'Gallenblase & Galle', ic: '🧴', d: 'leber', hl: ['gallenblase'], rows: [['Galle gebildet in', 'Leber'], ['gespeichert in', 'Gallenblase'], ['fließt in', 'Zwölffingerdarm'], ['Wirkung', 'Emulgieren: zerteilt Fette in kleine Fetttropfen'], ['wofür?', 'nur für die Fettverdauung, Enzyme kommen besser heran'], ['Enzym?', 'NEIN']], tip: 'Galle = Spülmittel' },
     { t: 'Bauchspeicheldrüse', ic: '🧪', d: 'leber', hl: ['bauchspeicheldruese'], rows: [['Fachwort', 'Pankreas'], ['Enzyme', 'Amylase, Trypsin, Lipase'], ['Hormone', 'Insulin ⬇︎, Glucagon ⬆︎ (Blutzucker)'], ['Saft macht den Brei', 'alkalisch (pH über 7)']], tip: 'Alle Tiere Lieben Katzen' },
   ],
   duenndarm: [
@@ -757,8 +956,8 @@ export const CARDS = {
     { t: 'Fette', ic: '🧈', d: 'abbau', hl: ['fette', 'glycerin', 'fettsaeuren'], rows: [['Aufbau', 'Glycerin + 3 Fettsäuren („Kamm“)'], ['Vorbereitung', 'Galle emulgiert'], ['Enzym', 'Lipase'], ['Bausteine', 'Glycerin + Fettsäuren → Lymphe'], ['Energie', 'ca. 39 kJ/g (am meisten!)']] },
   ],
   zoeliakie: [
-    { t: 'Zöliakie', ic: '🌾', d: 'zotte', hl: ['darmzotte'], rows: [['Was?', 'Glutenunverträglichkeit'], ['Gluten', 'Klebereiweiß im Getreide'], ['Folge im Darm', 'Entzündung, Zotten klein und flach'], ['Symptome', 'Müdigkeit, Bauchweh, Durchfall']], tip: 'kleine Zotten = kleine Oberfläche' },
-    { t: 'Intoleranz', ic: '🚫', rows: [['Ursache', 'Enzymdefekt (angeboren oder erworben)'], ['Laktose', 'Laktase fehlt'], ['Histamin', 'DAO fehlt'], ['erbliche Fruktose', 'Aldolase B fehlt']], tip: 'Intoleranz ≠ Allergie' },
+    { t: 'Zöliakie', ic: '🌾', d: 'zotte', hl: ['darmzotte'], rows: [['Was?', 'Glutenunverträglichkeit (Merkmale von Allergie und Autoimmunerkrankung)'], ['Gluten', 'Klebereiweiß im Getreide'], ['Folge im Darm', 'Entzündung, Zotten klein und flach'], ['Symptome', 'Müdigkeit, Bauchweh, Durchfall']], tip: 'kleine Zotten = kleine Oberfläche' },
+    { t: 'Intoleranz', ic: '🚫', rows: [['Ursache', 'Enzymdefekt (angeboren oder erworben)'], ['Beschwerden', 'Blähungen, Krämpfe, Durchfall, Verstopfung'], ['Laktose', 'Laktase fehlt'], ['Histamin', 'DAO fehlt'], ['erbliche Fruktose', 'Aldolase B fehlt']], tip: 'Intoleranz ≠ Allergie' },
     { t: 'Allergie', ic: '🤧', rows: [['Ursache', 'Überreaktion des Immunsystems'], ['worauf?', 'auf eigentlich harmlose Stoffe']] },
   ],
   dickdarm: [
@@ -783,9 +982,67 @@ export const CARDS = {
     { t: 'Schwann’sche Zelle', n: 3, ic: '🧣', d: 'neuron', hl: ['schwann'], rows: [['Nr.', '3'], ['Art', 'Gliazelle (Hüllzelle)'], ['bildet', 'Myelinscheide = Markscheide'], ['Bild im Kopf', 'Isolierung am Kabel']] },
     { t: 'Axon', n: 4, ic: '🔋', d: 'neuron', hl: ['axon'], rows: [['Nr.', '4'], ['auch', 'Neurit'], ['Bild im Kopf', 'Kabel'], ['Aufgabe', 'leitet Impulse weiter']] },
     { t: 'Ranvier’scher Schnürring', n: 5, ic: '🦘', d: 'neuron', hl: ['ranvier'], rows: [['Nr.', '5'], ['Was?', 'Lücke zwischen Schwann’schen Zellen'], ['Aufgabe', 'Impuls springt → schnelle Leitung']] },
-    { t: 'Axonhügel', n: 6, ic: '🚦', d: 'neuron', hl: ['axonhuegel'], rows: [['Nr.', '6'], ['Bild im Kopf', 'Startknopf'], ['Aufgabe', 'hier startet das Aktionspotenzial']] },
+    { t: 'Axonhügel', n: 6, ic: '🚦', d: 'neuron', hl: ['axonhuegel'], rows: [['Nr.', '6'], ['Bild im Kopf', 'Startknopf'], ['Aufgabe', 'hier startet das Aktionspotenzial, wenn der Schwellenwert überschritten wird']] },
     { t: 'Dendriten', n: 7, ic: '📡', d: 'neuron', hl: ['dendriten'], rows: [['Nr.', '7'], ['Bild im Kopf', 'Antennen'], ['Aufgabe', 'empfangen Signale']] },
     { t: 'Zellkörper', n: 8, ic: '🏭', d: 'neuron', hl: ['zellkoerper'], rows: [['Nr.', '8'], ['auch', 'Soma'], ['Aufgabe', 'Stoffwechselzentrum, enthält die Zellorganellen']] },
     { t: 'Zellkern', n: 9, ic: '👑', d: 'neuron', hl: ['zellkern'], rows: [['Nr.', '9'], ['Bild im Kopf', 'Chef'], ['Aufgabe', 'Steuerzentrale der Nervenzelle']] },
   ],
 };
+
+/* more cards so the whole booklet is covered (incl. all "Wusstest du?" boxes) */
+const MORE_CARDS = {
+  ueberblick: [
+    { t: 'Verdauungsorgane im Überblick', ic: '', d: 'organe', hl: [], rows: [['Kopf', 'Zähne, Zunge, 3 Speicheldrüsen'], ['Hals', 'Speiseröhre'], ['Oberbauch', 'Magen, Leber, Gallenblase, Bauchspeicheldrüse'], ['Bauch', 'Dünndarm (mit Zwölffingerdarm), Dickdarm'], ['Ende', 'Blinddarm + Wurmfortsatz, Mastdarm, After']] },
+  ],
+  mund: [
+    { t: 'Speicheldrüsen', d: 'organe', hl: ['ohrspeicheldruese', 'unterkieferspeicheldruese', 'unterzungenspeicheldruese'], rows: [['Große Drüsen', 'Ohrspeicheldrüse, Unterkieferspeicheldrüse, Unterzungenspeicheldrüse'], ['Dazu', 'viele kleine Drüsen der Mundschleimhaut'], ['Menge', '1–1,5 l Speichel pro Tag'], ['Speichel macht', 'gleitfähig + Amylase']] },
+    { t: 'Zahnformel', d: 'zaehne', hl: [], rows: [['Gezählt wird', 'ein Viertel, von der Mitte nach hinten'], ['Reihenfolge', 'I – C – P – M'], ['Dauergebiss', '2-1-2-3 → 8 × 4 = 32'], ['Milchgebiss', '2-1-2 (ohne P) → 5 × 4 = 20']], tip: 'Mitte = Schneidezähne, hinten = Mahlzähne' },
+    { t: 'Weisheitszähne', d: 'zaehne', hl: ['weisheitszaehne'], rows: [['Nr.', '5'], ['Was?', 'die dritten, hintersten Mahlzähne'], ['Besonders', 'Überbleibsel aus der Entwicklung des Menschen']] },
+    { t: 'Speichel & Karies', rows: [['Im Speichel', 'ca. 10 Millionen Mikroorganismen pro Tropfen'], ['Vor allem', 'Streptokokken (kugelförmige Bakterien)'], ['Folge', 'spielen bei der Entstehung von Karies eine große Rolle']], tip: 'Wusstest du? (Seite 4)' },
+    { t: 'Nachweis der Peristaltik', d: 'organe', hl: ['speiseroehre'], rows: [['Versuch', 'im Kopfstand mit Trinkhalm Wasser schlucken'], ['Ergebnis', 'Schlucken klappt'], ['Grund', 'Peristaltik schiebt den Bissen aktiv weiter, ohne Schwerkraft']] },
+  ],
+  magen: [
+    { t: 'Magensaft', d: 'schleimhaut', hl: ['magensaft'], rows: [['Menge', 'ca. 2 Liter pro Tag'], ['Inhalt', 'Salzsäure + Schleim + Enzyme'], ['Salzsäure', 'pH 2, aus den Belegzellen'], ['Enzym', 'Pepsin (aus Pepsinogen)']] },
+    { t: 'Pepsinogen → Pepsin', d: 'schleimhaut', hl: ['hauptzelle', 'belegzelle'], rows: [['Hauptzellen bilden', 'Pepsinogen (inaktiv)'], ['Aktiviert durch', 'Salzsäure'], ['Pepsin spaltet', 'Proteine → Peptide'], ['Warum erst inaktiv?', 'Schutz vor Selbstverdauung']] },
+    { t: 'Magenmund & Pförtner', d: 'magen', hl: ['magenmund', 'pfoertner'], rows: [['Magenmund', 'Mageneingang mit Schließmuskel'], ['Pförtner', 'Magenausgang'], ['Pförtner gibt', 'den Brei portionsweise in den Zwölffingerdarm']] },
+    { t: 'Verweildauer & Magenknurren', d: 'magen', hl: ['mischraum'], rows: [['Fisch', 'gut 1 Stunde'], ['Schweinebraten', '5–7 Stunden'], ['Ölsardinen', 'bis zu 12 Stunden (sehr fett)'], ['Kneten', 'etwa alle 20 Sekunden'], ['Magenknurren', 'Kneten bei leerem Magen']], tip: 'Wusstest du? (Seite 6)' },
+  ],
+  leber: [
+    { t: 'Insulin & Glucagon', d: 'leber', hl: ['bauchspeicheldruese'], rows: [['Gebildet in', 'Bauchspeicheldrüse'], ['Art', 'Hormone (keine Enzyme!)'], ['Insulin', 'senkt den Blutzuckerspiegel'], ['Glucagon', 'hebt den Blutzuckerspiegel']], tip: 'Insulin → Zucker in die Zellen' },
+    { t: 'Säfte im Zwölffingerdarm', d: 'leber', hl: ['duenndarm', 'gallenblase', 'bauchspeicheldruese'], rows: [['Von der Leber', 'Galle (über den Gallengang)'], ['Von der Bauchspeicheldrüse', 'Amylase, Trypsin, Lipase'], ['Wirkung', 'Brei wird alkalisch (pH über 7)'], ['Wozu?', 'damit die Enzyme im Dünndarm wirken können']] },
+  ],
+  duenndarm: [
+    { t: 'Bau der Dünndarmwand', d: 'zotte', hl: [], rows: [['Außen', 'Ring- und Längsmuskulatur'], ['Innen', 'Ringfalten (Kerckring-Falten)'], ['Darauf', 'Darmzotten, dazwischen Krypten'], ['In jeder Zotte', 'Kapillaren + Lymphgefäß'], ['Auf den Darmzellen', 'Mikrovilli = Bürstensaum']] },
+    { t: 'Was im Dünndarm passiert', d: 'abbau', hl: ['glucose', 'aminosaeuren', 'glycerin', 'fettsaeuren'], rows: [['Stärke', '→ Maltose → Glucose (Amylase, Maltase)'], ['Proteine', '→ Aminosäuren (Peptidasen, z. B. Trypsin)'], ['Fette', '→ Glycerin + Fettsäuren (Galle, Lipase)'], ['Dann', 'Aufnahme über die Darmzotten']] },
+  ],
+  abbau: [
+    { t: 'Die Bausteine im Überblick', d: 'seite8abb1', hl: ['glucose', 'aminosaeuren', 'glycerin', 'fettsaeuren'], rows: [['Kohlenhydrate', 'Glucose → Blut'], ['Proteine', 'Aminosäuren → Blut'], ['Fette', 'Glycerin + Fettsäuren → Lymphe'], ['Blut weiter', 'über die Pfortader zur Leber'], ['Lymphe weiter', 'über die obere Hohlvene ins Blut']], tip: 'Blut-Bus und Lymph-Boot' },
+  ],
+  zoeliakie: [
+    { t: 'Gesund oder Zöliakie?', d: 'zotte', hl: ['darmzotte'], rows: [['Gesund', 'lange Zotten, große Oberfläche'], ['Zöliakie', 'kurze, flache Zotten, kleine Oberfläche'], ['Folge', 'weniger Nährstoffe → müde, antriebslos'], ['Unverdautes', '→ Bauchschmerzen, Durchfall']] },
+  ],
+  dickdarm: [
+    { t: 'Darmgase', rows: [['Entstehen', 'beim Abbau durch die Darmbakterien'], ['Heft', 'vor allem Methan'], ['Ein Teil', 'über das Blut zur Lunge, wird ausgeatmet'], ['Der Rest', 'täglich 0,5–1,5 l durch den After']], tip: 'Wusstest du? (Seite 11)' },
+  ],
+  enzyme: [
+    { t: 'Enzyme allgemein', rows: [['Was?', 'Eiweiße, die wie Scheren spalten'], ['Name', 'endet meist auf -ase'], ['Prinzip', 'Schlüssel-Schloss-Prinzip: nur ein Substrat'], ['Verbrauch', 'werden nicht verbraucht'], ['Brauchen', 'passende Temperatur und pH-Wert']] },
+    { t: 'Die drei Abbauwege', d: 'abbau', hl: [], rows: [['Kohlenhydrate', 'Amylase → Maltase → Glucose'], ['Proteine', 'Pepsin, Trypsin → Peptidasen → Aminosäuren'], ['Fette', 'Galle (emulgiert) → Lipase → Glycerin + Fettsäuren']] },
+  ],
+  neuron: [
+    { t: 'Weg des Signals', d: 'neuron', hl: [], rows: [['1.', 'Dendriten empfangen'], ['2.', 'Zellkörper → Axonhügel (Start)'], ['3.', 'Axon leitet weiter, springt von Schnürring zu Schnürring'], ['4.', 'Endknöpfchen → Synapse → nächste Zelle']], tip: 'Die Zauberkatze Ahnt Alles, Ehrlich Sicher!' },
+  ],
+};
+for (const [k, list] of Object.entries(MORE_CARDS)) CARDS[k].push(...list);
+
+const CARD_ORDER = {
+  mund: ['Mundhöhle', 'Speicheldrüsen', 'Speichel & Karies', 'Dauergebiss', 'Milchgebiss', 'Zahnformel', 'Schneidezähne', 'Eckzähne', 'Backenzähne', 'Mahlzähne', 'Weisheitszähne', 'Speiseröhre', 'Nachweis der Peristaltik'],
+  magen: ['Magen', 'Magenmund & Pförtner', 'Magensaft', 'Belegzellen', 'Hauptzellen', 'Nebenzellen', 'Pepsinogen → Pepsin', 'Sodbrennen', 'Verweildauer & Magenknurren'],
+  leber: ['Leber', 'Pfortader', 'Gallenblase & Galle', 'Bauchspeicheldrüse', 'Insulin & Glucagon', 'Säfte im Zwölffingerdarm'],
+  duenndarm: ['Dünndarm', 'Was im Dünndarm passiert', 'Bau der Dünndarmwand', 'Darmzotte', 'Mikrovilli', 'Oberflächenvergrößerung', 'Blut oder Lymphe?'],
+  enzyme: ['Enzyme allgemein', 'Amylase', 'Pepsin', 'Trypsin', 'Lipase', 'Maltase', 'Peptidasen', 'Laktase', 'KEIN Enzym!', 'Die drei Abbauwege'],
+  neuron: ['Weg des Signals'],
+};
+for (const [k, order] of Object.entries(CARD_ORDER)) {
+  const rank = (c) => { const i = order.indexOf(c.t); return i < 0 ? 100 + (c.n || 0) : i; };
+  CARDS[k].sort((a, b) => rank(a) - rank(b));
+}

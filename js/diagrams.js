@@ -312,6 +312,53 @@ function breakdownArt() {
   return s;
 }
 
+
+/* ------------------------------------------------------------------ */
+/* 9. Seite 8, Abbildung 1 "Vorgänge bei der Verdauung" – like the booklet:
+      legend left, small intestine in the middle, blood and lymph vessels above and below */
+function page8Art() {
+  const ring = (x, y, r = 9) => `<polygon points="${[0, 60, 120, 180, 240, 300].map((a) => { const t = a * Math.PI / 180; return `${(x + r * Math.cos(t)).toFixed(1)},${(y + r * Math.sin(t)).toFixed(1)}`; }).join(' ')}" fill="#ffcf5c" stroke="${OUT}" stroke-width="2"/>`;
+  const bead = (x, y, col, r = 7) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${col}" stroke="${OUT}" stroke-width="2"/>`;
+  const fa = (x, y, w = 40, rot = 0) => `<rect x="${x}" y="${y - 4}" width="${w}" height="8" rx="4" fill="#7cc46a" stroke="${OUT}" stroke-width="1.8" transform="rotate(${rot} ${x} ${y})"/>`;
+  const gly = (x, y) => `<rect x="${x}" y="${y - 11}" width="9" height="22" rx="3" fill="#ffcf5c" stroke="${OUT}" stroke-width="1.8"/>`;
+  const AA = ['#ff8fa3', '#8fd3ff', '#b39cff', '#7cc46a', '#ffb020'];
+  const chain = (x, y, n) => Array.from({ length: n }, (_, i) => ring(x + i * 16, y + (i % 2 ? -7 : 0))).join('');
+  const prot = (x, y) => { const pts = [[0, 0], [14, -8], [28, 0], [22, 13], [8, 15], [-4, 10], [36, 12]]; return `<path d="M${pts.map((q) => (x + q[0]) + ' ' + (y + q[1])).join(' L')}" stroke="${OUT}" stroke-width="2" fill="none"/>` + pts.map((q, i) => bead(x + q[0], y + q[1], AA[i % 5], 6)).join(''); };
+  const fat = (x, y) => gly(x, y) + fa(x + 9, y - 7, 30) + fa(x + 9, y, 30) + fa(x + 9, y + 7, 30);
+  const arrow = (x, y1, y2, col) => `<path d="M${x} ${y1} V${y2 + (y2 < y1 ? 10 : -10)}" stroke="${col}" stroke-width="3"/><path d="M${x} ${y2} l-7 ${y2 < y1 ? 12 : -12} h14 z" fill="${col}"/>`;
+  let s = '';
+  // legend (left), like the booklet
+  s += `<rect x="6" y="10" width="178" height="452" rx="14" fill="#fff8ee" stroke="${OUT}" stroke-opacity=".15"/>`;
+  s += `<g font-family="Nunito, sans-serif" font-weight="900" font-size="17" fill="${OUT}"><text x="18" y="38">1. Fette</text><text x="18" y="168">2. Proteine</text><text x="18" y="322">3. Kohlenhydrate</text></g>`;
+  s += part('fettsaeuren', fa(28, 62, 60));
+  s += part('glycerin', gly(30, 96));
+  s += part('proteine', prot(30, 200));
+  s += part('oligopeptide', `<path d="M30 248 H66" stroke="${OUT}" stroke-width="2"/>` + bead(30, 248, AA[0]) + bead(48, 248, AA[2]) + bead(66, 248, AA[4]));
+  s += part('aminosaeuren', bead(32, 284, AA[1]) + bead(56, 284, AA[3]));
+  s += part('staerke', chain(28, 360, 6));
+  s += part('maltose', ring(30, 402) + ring(48, 402));
+  s += part('glucose', ring(32, 438));
+  // vessels
+  const bloodTop = 'M214 70 C300 34 420 40 486 104', lymphTop = 'M520 82 C600 56 690 62 750 100';
+  const lymphBot = 'M214 404 C300 368 420 360 486 338', bloodBot = 'M520 340 C600 378 690 396 750 362';
+  s += part('blutgefaess8', tube(bloodTop, 30, '#f2878b') + tube(bloodBot, 30, '#f2878b') +
+    ring(300, 52, 7) + bead(340, 50, AA[1], 6) + ring(380, 56, 7) + bead(420, 66, AA[3], 6) +
+    ring(580, 360, 7) + bead(620, 372, AA[0], 6) + ring(660, 376, 7) + bead(700, 372, AA[2], 6));
+  s += part('lymphgefaess8', tube(lymphTop, 16, '#d6efc0') + tube(lymphBot, 16, '#d6efc0') +
+    fa(580, 68, 26, 8) + fa(640, 66, 26, 4) + gly(690, 74) + fa(270, 384, 26, -14) + fa(330, 372, 26, -10) + gly(400, 362));
+  // small intestine (lumen) with walls
+  s += part('darm8', `<rect x="196" y="136" width="560" height="160" fill="#fff1e3"/>` +
+    `<path d="M196 132 H756 M196 140 H756 M196 292 H756 M196 300 H756" stroke="${OUT}" stroke-width="2" stroke-dasharray="7 6" opacity=".55"/>`);
+  // contents: big on the left, small on the right
+  s += chain(222, 176, 6) + prot(232, 236) + fat(330, 200) + chain(300, 266, 4);
+  s += ring(420, 176) + ring(436, 176) + `<path d="M410 230 H446" stroke="${OUT}" stroke-width="2"/>` + bead(410, 230, AA[0]) + bead(428, 230, AA[2]) + bead(446, 230, AA[4]) + ring(470, 268) + ring(486, 268) + gly(500, 196) + fa(512, 190, 30, 10);
+  s += ring(560, 172) + ring(612, 252) + bead(586, 210, AA[1]) + bead(650, 180, AA[3]) + bead(700, 238, AA[0]) + ring(726, 186) + gly(640, 228) + fa(660, 270, 34, -6) + fa(690, 160, 30, 12) + bead(560, 270, AA[2]);
+  s += `<text x="204" y="128" font-family="Nunito, sans-serif" font-weight="900" font-size="15" fill="${OUT}" opacity=".7">Dünndarm</text>`;
+  // arrows: Glucose + Aminosäuren into blood, fat building blocks into lymph
+  s += arrow(360, 140, 84, C.red) + arrow(640, 296, 352, C.red) + arrow(640, 140, 82, '#3a9d2f') + arrow(360, 296, 372, '#3a9d2f');
+  return s;
+}
+
 /* ------------------------------------------------------------------ */
 /* Registry: parts in label order. at = point on the structure, mk = marker position. */
 export const DIAGRAMS = {
@@ -407,6 +454,34 @@ export const DIAGRAMS = {
       { id: 'bauchspeicheldruese', name: 'Bauchspeicheldrüse', alts: ['Bauchspeicheldrüse', 'Pankreas', 'Bauchspeicheldruese'], at: [470, 330], mk: [560, 390], info: 'Liegt quer hinter/unter dem Magen.' },
       { id: 'vene', name: 'Vene', alts: ['Vene', 'Hohlvene', 'untere Hohlvene'], at: [372, 440], mk: [470, 462], info: 'Führt das Blut zurück zum Herzen.' },
       { id: 'duenndarm', name: 'Dünndarm (Zwölffingerdarm)', alts: ['Dünndarm', 'Zwölffingerdarm', 'Duenndarm', 'Zwoelffingerdarm'], at: [236, 360], mk: [40, 400], info: 'Der Anfang des Dünndarms legt sich wie ein C um den Kopf der Bauchspeicheldrüse.' },
+    ],
+  },
+  seite8abb1: {
+    title: 'Seite 8, Abbildung 1: Vorgänge bei der Verdauung', vb: [0, 0, 760, 470], art: page8Art,
+    note: 'So wie im Heft: links die Teilchen (Legende), in der Mitte der Dünndarm, oben und unten Blut- und Lymphgefäße.',
+    parts: [
+      { id: 'fettsaeuren', name: 'Fettsäuren', alts: ['Fettsäuren', 'Fettsäure', 'Fettsaeuren'], at: [58, 62], mk: [130, 62], info: 'Bausteine der Fette (lange Stäbchen). Sie gehen ins Lymphgefäß.' },
+      { id: 'glycerin', name: 'Glycerin', alts: ['Glycerin', 'Glyzerin'], at: [35, 96], mk: [130, 100], info: 'Baustein der Fette (kurzes Stück). Geht ins Lymphgefäß.' },
+      { id: 'proteine', name: 'Proteine', alts: ['Proteine', 'Protein', 'Eiweiße', 'Eiweiß'], at: [44, 205], mk: [130, 200], info: 'Lange, gefaltete Ketten aus vielen Aminosäuren.' },
+      { id: 'oligopeptide', name: 'Oligopeptide', alts: ['Oligopeptide', 'Oligopeptid', 'Peptide'], at: [48, 248], mk: [130, 246], info: 'Kurze Ketten aus wenigen Aminosäuren (Zwischenstufe).' },
+      { id: 'aminosaeuren', name: 'Aminosäuren', alts: ['Aminosäuren', 'Aminosäure', 'Aminosaeuren'], at: [44, 284], mk: [130, 288], info: 'Einzelne Bausteine der Proteine. Gehen ins Blutgefäß.' },
+      { id: 'staerke', name: 'Stärke', alts: ['Stärke', 'Staerke'], at: [70, 356], mk: [150, 352], info: 'Lange Kette aus Glucose-Ringen.' },
+      { id: 'maltose', name: 'Maltose', alts: ['Maltose', 'Malzzucker'], at: [40, 402], mk: [130, 402], info: 'Zwei Glucose-Ringe (Zwischenstufe).' },
+      { id: 'glucose', name: 'Glucose', alts: ['Glucose', 'Glukose', 'Traubenzucker'], at: [32, 438], mk: [130, 440], info: 'Ein einzelner Ring: kleinster Baustein der Kohlenhydrate. Geht ins Blutgefäß.' },
+      { id: 'darm8', name: 'Dünndarm', alts: ['Dünndarm', 'Duenndarm', 'Darm'], at: [470, 216], mk: [470, 216], info: 'Hier zerlegen die Enzyme die großen Nährstoffe in Bausteine.' },
+      { id: 'blutgefaess8', name: 'Blutgefäß', alts: ['Blutgefäß', 'Blutgefäße', 'Blutgefaess', 'Blut'], at: [300, 46], mk: [262, 22], info: 'Nimmt Glucose und Aminosäuren auf (weiter über die Pfortader zur Leber).' },
+      { id: 'lymphgefaess8', name: 'Lymphgefäß', alts: ['Lymphgefäß', 'Lymphgefäße', 'Lymphgefaess', 'Lymphe'], at: [620, 64], mk: [740, 30], info: 'Nimmt die Fettbausteine (Fettsäuren, Glycerin) auf, über die obere Hohlvene später ins Blut.' },
+    ],
+  },
+  seite8abb2: {
+    title: 'Seite 8, Abbildung 2: Bau des Dünndarms', vb: [0, 0, 600, 500], art: villusArt,
+    note: 'Mit denselben Buchstaben wie im Heft (a bis d). „Darmzelle“ steht im Heft schon im Kästchen.',
+    parts: [
+      { id: 'darmzotte', n: 'a', name: 'Darmzotten', alts: ['Darmzotten', 'Darmzotte', 'Zotten', 'Zotte'], at: [200, 220], mk: [60, 90], info: 'Fingerförmige Ausstülpungen der Darmwand: vergrößern die Oberfläche.' },
+      { id: 'mikrovilli', n: 'b', name: 'Mikrovilli', alts: ['Mikrovilli', 'Microvilli', 'Bürstensaum'], at: [490, 64], mk: [490, 280], info: 'Winzige Ausstülpungen der Darmzellen, zusammen der Bürstensaum.' },
+      { id: 'blutgefaess', n: 'c', name: 'Blutgefäße', alts: ['Blutgefäße', 'Blutgefäß', 'Kapillaren', 'Blutgefaesse'], at: [222, 260], mk: [60, 240], info: 'Nehmen Glucose und Aminosäuren auf.' },
+      { id: 'lymphgefaess', n: 'd', name: 'Lymphgefäß', alts: ['Lymphgefäß', 'Lymphgefäße', 'Lymphgefaess'], at: [250, 200], mk: [60, 160], info: 'Nimmt die Fette auf.' },
+      { id: 'darmzelle', n: 'e', name: 'Darmzelle', alts: ['Darmzelle', 'Darmzellen', 'Epithelzelle'], at: [302, 300], mk: [370, 320], info: 'Deckzelle der Zotte, trägt die Mikrovilli und nimmt die Bausteine auf.' },
     ],
   },
   zotte: {

@@ -18,6 +18,7 @@ export const usableAt = (q, level) => (level === 1 ? L1 : L2).has(q.t);
 export function renderQuestion(q, ctx) {
   const wrap = h('div', { class: 'qcard' });
   const kind = h('div', { class: 'qkind' }, ctx.level === 2 && ['fact', 'cloze', 'label', 'grid', 'formula'].includes(q.t) ? 'Eintippen · ' : '', TYPE_NAMES[q.t] || '');
+  if (q.heft) kind.append(h('span', { class: 'heft' }, 'Aus dem Heft · ' + q.heft));
   wrap.append(kind);
   const R = RENDER[q.t];
   R(q, ctx, wrap);
@@ -156,31 +157,36 @@ const RENDER = {
     wrap.append(act.box);
   },
   match(q, ctx, wrap) {
-    wrap.append(title(q.q), h('div', { class: 'hint', style: { marginTop: '-8px', marginBottom: '10px' } }, 'Tippe links an, dann das passende Feld rechts.'));
+    wrap.append(title(q.q), h('div', { class: 'hint', style: { marginTop: '-8px', marginBottom: '10px' } }, 'Tippe ein Feld an und dann das passende auf der anderen Seite.'));
     const left = shuffle(q.pairs.map((p, i) => [p[0], i]));
-    const right = shuffle(q.pairs.map((p, i) => [p[1], i]));
-    let selL = null, mistakes = 0, matched = 0;
+    const right = shuffleNot2(q.pairs.map((p, i) => [p[1], i]), left);
+    let sel = null, mistakes = 0, matched = 0;
     const grid = h('div', { class: 'pairs' });
     const colL = h('div', { class: 'col' }), colR = h('div', { class: 'col' });
-    const lb = left.map(([t, i]) => { const b = h('button', { class: 'pair' }, t); b.dataset.i = i; colL.append(b); return b; });
-    const rb = right.map(([t, i]) => { const b = h('button', { class: 'pair' }, t); b.dataset.i = i; colR.append(b); return b; });
-    lb.forEach((b) => b.onclick = () => { if (b.classList.contains('done')) return; snd.tap(); lb.forEach((x) => x.classList.remove('sel')); b.classList.add('sel'); selL = b; });
-    rb.forEach((b) => b.onclick = () => {
-      if (b.classList.contains('done') || !selL) return;
-      if (b.dataset.i === selL.dataset.i) {
-        b.classList.add('done'); selL.classList.add('done'); selL.classList.remove('sel'); selL = null; matched++;
+    const mk = (t, i, side, col) => { const b = h('button', { class: 'pair' }, t); b.dataset.i = i; b.dataset.side = side; col.append(b); return b; };
+    const all = [...left.map(([t, i]) => mk(t, i, 'L', colL)), ...right.map(([t, i]) => mk(t, i, 'R', colR))];
+    const count = h('div', { class: 'pcount' }, `0 von ${q.pairs.length} Paaren`);
+    all.forEach((b) => b.onclick = () => {
+      if (b.classList.contains('done')) return;
+      if (!sel || sel.dataset.side === b.dataset.side) {
+        snd.tap(); all.forEach((x) => x.classList.remove('sel')); b.classList.add('sel'); sel = b; return;
+      }
+      const a = sel; sel = null; a.classList.remove('sel');
+      if (a.dataset.i === b.dataset.i || ctx.exam) {
+        if (a.dataset.i !== b.dataset.i) mistakes++;
+        a.classList.add('done'); b.classList.add('done'); matched++;
+        count.textContent = `${matched} von ${q.pairs.length} Paaren`;
         if (!ctx.exam) snd.correct(matched);
         if (matched === q.pairs.length) finish();
       } else {
-        mistakes++;
-        if (ctx.exam) { // in the exam a wrong pair still locks (no second chance)
-          b.classList.add('done'); selL.classList.add('done'); selL.classList.remove('sel'); selL = null; matched++;
-          if (matched === q.pairs.length) finish();
-        } else { snd.wrong(); b.classList.add('shake'); selL.classList.add('shake'); const s = selL; setTimeout(() => { b.classList.remove('shake'); s.classList.remove('shake'); }, 400); }
+        mistakes++; snd.wrong();
+        a.classList.add('shake'); b.classList.add('shake');
+        count.textContent = 'Passt nicht – versuch es nochmal';
+        setTimeout(() => { a.classList.remove('shake'); b.classList.remove('shake'); count.textContent = `${matched} von ${q.pairs.length} Paaren`; }, 900);
       }
     });
     grid.append(colL, colR);
-    wrap.append(grid);
+    wrap.append(grid, count);
     function finish() {
       const score = Math.max(0, 1 - mistakes / q.pairs.length);
       ctx.done({ score, ok: mistakes === 0, html: q.pairs.map((p) => `${esc(p[0])} → <b>${esc(p[1])}</b>`).join('<br>') + (q.ex ? `<br>${esc(q.ex)}` : ''), answer: q.pairs.map((p) => p[0] + ' → ' + p[1]).join('; ') });
@@ -291,7 +297,7 @@ const RENDER = {
     wrap.append(title(q.q));
     const dg = h('div', { class: 'diagram', html: diagramSVG(q.d, { only: ids }) });
     wrap.append(dg);
-    const sorted = parts.slice().sort((a, b) => nums[a.id] - nums[b.id]);
+    const sorted = parts.slice().sort((a, b) => String(nums[a.id]).localeCompare(String(nums[b.id]), 'de', { numeric: true }));
     const slots = h('div', { class: 'slots' });
     const S = sorted.map((p) => {
       const val = ctx.level === 1 ? h('span', { class: 'val' }, 'antippen …') : h('input', { type: 'text', placeholder: 'Name eintippen', autocapitalize: 'sentences', autocomplete: 'off', spellcheck: 'false', enterkeyhint: 'next' });
@@ -402,6 +408,12 @@ const RENDER = {
 };
 
 /* ---------- shared bits ---------- */
+function shuffleNot2(items, other) {
+  // right column order should not mirror the left one
+  let r = shuffle(items);
+  for (let k = 0; k < 6 && r.every((x, j) => x[1] === other[j][1]); k++) r = shuffle(items);
+  return r;
+}
 function shuffleNot(items) {
   let s = shuffle(items);
   for (let i = 0; i < 5 && s.every((x, j) => x === items[j]); i++) s = shuffle(items);
@@ -409,6 +421,7 @@ function shuffleNot(items) {
 }
 
 function choice(wrap, opts, isRight, ctx, q, rightText) {
+  if (ctx.fifty) { const w = opts.filter((o) => !isRight(o)); opts = shuffle([opts.find(isRight), w[0]]); }
   const box = h('div', { class: 'opts' });
   let locked = false;
   const keys = 'ABCD';

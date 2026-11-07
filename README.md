@@ -14,11 +14,15 @@ Du bist Tierärztin in Ausbildung bei **Dr. Schnurrhaar**: Jedes Kapitel ist ein
 - **Abbildungen zum Beschriften**, nachgezeichnet wie auf den Arbeitsblättern (Nervenzelle mit denselben Nummern 1–9)
 - **Stufe 1 (antippen)**: Auswahl, Zuordnen, Reihenfolge, Sortieren, Lückentext, Beschriften, Enzym-Tabelle
 - **Stufe 2 (eintippen)**: selbst schreiben, kleine Tippfehler werden verziehen und die richtige Schreibweise gezeigt
+- **Prüfstoff Seite für Seite**: jede Heftseite mit ihren Inhalten und allen Aufgaben vom Blatt als Übung (siehe [ABDECKUNG.md](ABDECKUNG.md))
+- **Wer wird Tierärztin?**: Quizshow mit 15 Stufen, 3 Jokern (50:50, Tipp, Tauschen) und 3 Leben
+- **Der große Durchgang**: alle Aufgaben des Prüfstoffs am Stück, mit „sicher gewusst / geraten“; Geratenes kommt wieder
 - **Schnell-Runde**: mischt alle Themen und fragt die schwächsten Karten zuerst ab
 - **Probearbeit**: 20 Minuten, ca. 24 Punkte, Note am Ende, jedes Mal andere Aufgaben
 - **Lernplan** bis zum Test, nach Lernforschung (Abfragen, verteilt lernen, mischen, schlafen)
 - **Gamification**: Leckerli 🐟, Karriere von der Praktikantin zur Chefärztin, Pfoten-Serie 🐾, Combos 🔥, 16 Katzen zum Sammeln mit echtem Tierärztinnen-Wissen
-- **Töne und Musik** werden live im Browser erzeugt (Miau, Schnurren, 3 Musikstücke), es gibt keine Audiodateien
+- **Töne und Musik** werden live im Browser erzeugt (Miau, Schnurren, 3 Musikstücke)
+- **Stimme der Filme**: die beste deutsche Gerätestimme (Premium/Natural bevorzugt, in den Einstellungen wählbar). Optional echte KI-Sprachaufnahmen: `OPENAI_API_KEY=… node tools/make-audio.mjs` legt sie unter `audio/` ab
 
 ## Am iPhone installieren
 
@@ -42,6 +46,9 @@ js/diagrams.js      Die nachgezeichneten Abbildungen (SVG)
 js/cats.js          Dr. Schnurrhaar und alle Katzen (SVG)
 js/audio.js         Töne und Musik (Web Audio)
 js/store.js         Fortschritt, Ränge, Karteikasten
+js/icons.js         Symbole
+js/voice.js         Stimme der Erklär-Filme
+tools/make-audio.mjs  KI-Sprachaufnahmen erzeugen (optional)
 sw.js               Offline
 ```
 
