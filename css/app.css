@@ -110,7 +110,7 @@ p { margin: 0 0 .7em; }
 #app { max-width: 760px; margin: 0 auto; padding: 14px max(16px, env(safe-area-inset-right, 0px)) calc(var(--tabh) + var(--safe-b) + 28px) max(16px, env(safe-area-inset-left, 0px)); }
 body.focus #app { padding-bottom: calc(var(--safe-b) + 24px); }
 body.focus #tabs { display: none; }
-.screen { animation: in .26s ease both; }
+.screen { animation: in .26s ease backwards; }
 @keyframes in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 /* ---------- tab bar ---------- */
@@ -583,3 +583,22 @@ table.formula tr.lower td { padding-top: 7px; }
 .yt .play.web .ico { fill: none; }
 .yt .play.search { background: #e62d2d; }
 .yt .play.search .ico { fill: none; }
+
+/* film: stronger focus + fullscreen */
+.player .stage .diagram.dim .part { opacity: .16; filter: grayscale(.85); }
+.player .stage .diagram .part.hl { opacity: 1 !important; animation: glow 1.5s ease-in-out infinite; }
+@keyframes glow {
+  0%, 100% { filter: drop-shadow(0 0 3px var(--sun)) drop-shadow(0 0 2px var(--sun)); }
+  50% { filter: drop-shadow(0 0 12px var(--sun)) drop-shadow(0 0 5px var(--sun)); }
+}
+.focuschip { position: absolute; right: 10px; top: 10px; z-index: 3; display: inline-flex; align-items: center; gap: 5px; max-width: 72%;
+  background: var(--accent); color: #fff; font-weight: 800; font-size: .82rem; padding: 5px 11px; border-radius: 99px; box-shadow: var(--shadow); animation: in .35s ease both; }
+.focuschip .ico { width: 15px; height: 15px; }
+.player.full { position: fixed; inset: 0; z-index: 95; border-radius: 0; display: flex; flex-direction: column; border: 0;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+.player.full .stage { flex: 1; aspect-ratio: auto; min-height: 0; }
+.player.full .sub { min-height: 0; font-size: 1.1rem; }
+body.noscroll { overflow: hidden; }
+.diagram svg { transition: none; }
+.player .stage .focuschip svg.ico { width: 15px; height: 15px; flex: none; }
+.player .stage .title svg { width: auto; height: auto; }

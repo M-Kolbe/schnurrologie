@@ -556,3 +556,46 @@ export function highlight(root, ids = []) {
   root.classList.toggle('dim', set.size > 0);
   root.querySelectorAll('.part').forEach((g) => g.classList.toggle('hl', set.has(g.dataset.part)));
 }
+
+/* Zoom the SVG inside `root` onto the parts `ids` (animated viewBox). Empty ids = whole picture. */
+export function zoomTo(root, ids = [], opts = {}) {
+  const svg = root.querySelector('svg');
+  if (!svg) return null;
+  if (!svg.dataset.vb) svg.dataset.vb = svg.getAttribute('viewBox');
+  const [fx, fy, fw, fh] = svg.dataset.vb.split(/\s+/).map(Number);
+  let target = [fx, fy, fw, fh];
+  if (ids && ids.length) {
+    let x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
+    for (const id of ids) root.querySelectorAll(`.part[data-part="${id}"]`).forEach((g) => {
+      let b; try { b = g.getBBox(); } catch (e) { return; }
+      if (!b || (!b.width && !b.height)) return;
+      x1 = Math.min(x1, b.x); y1 = Math.min(y1, b.y); x2 = Math.max(x2, b.x + b.width); y2 = Math.max(y2, b.y + b.height);
+    });
+    if (x1 < Infinity) {
+      const ar = opts.aspect || fw / fh;
+      const pad = Math.max(x2 - x1, y2 - y1) * 0.35 + 24;
+      let w = x2 - x1 + pad * 2, hh = y2 - y1 + pad * 2;
+      if (w / hh > ar) hh = w / ar; else w = hh * ar;
+      const minW = fw * (opts.minFrac || 0.42);
+      if (w < minW) { w = minW; hh = w / ar; }
+      if (w > fw && hh > fh) { w = fw; hh = fh; }
+      const cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
+      let x = cx - w / 2, y = cy - hh / 2;
+      if (w <= fw) x = Math.max(fx, Math.min(x, fx + fw - w)); else x = fx + (fw - w) / 2;
+      if (hh <= fh) y = Math.max(fy, Math.min(y, fy + fh - hh)); else y = fy + (fh - hh) / 2;
+      target = [x, y, w, hh];
+    }
+  }
+  const from = (opts.from || svg.getAttribute('viewBox').split(/\s+/).map(Number));
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const dur = reduce ? 0 : (opts.duration ?? 700);
+  const t0 = performance.now();
+  const ease = (u) => (u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2);
+  const step = (t) => {
+    const u = dur ? Math.min(1, (t - t0) / dur) : 1, e = ease(u);
+    svg.setAttribute('viewBox', from.map((v, k) => (v + (target[k] - v) * e).toFixed(1)).join(' '));
+    if (u < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+  return target;
+}

@@ -2,7 +2,7 @@
 import { $, $$, h, frag, shuffle, pick, esc, daysUntil, todayStr, clamp } from './util.js';
 import { S, save, reset, addXP, rankFor, RANKS, record, item, chapterState, mastery, unlockCat } from './store.js';
 import { CHAPTERS, CARDS, PLAN, ALL_QUESTIONS, WORKSHEETS, chapterById } from './content.js';
-import { DIAGRAMS, diagramSVG, numbering, highlight, partById } from './diagrams.js';
+import { DIAGRAMS, diagramSVG, numbering, highlight, partById, zoomTo } from './diagrams.js';
 import { docSVG, CATS, catById, catPic } from './cats.js';
 import { renderQuestion, pickSession, usableAt, itemKey } from './engine.js';
 import { icon as I, CH_ICON } from './icons.js';
@@ -399,7 +399,11 @@ function learn(id) {
       const p = partById(did, mk.dataset.part);
       $$('.mk', d).forEach((x) => x.classList.toggle('sel', x === mk));
       highlight(d, [p.id]); snd.tap();
-      cap.innerHTML = `<b>${nums[p.id]} · ${esc(p.name)}</b> – ${esc(p.info)}`;
+      zoomTo(d, [p.id]);
+      cap.innerHTML = `<b>${nums[p.id]} · ${esc(p.name)}</b> – ${esc(p.info)} `;
+      const r = h('a', { href: '#', class: 'small' }, 'Ganzes Bild');
+      r.onclick = (ev) => { ev.preventDefault(); zoomTo(d, []); highlight(d, []); $$('.mk', d).forEach((x) => x.classList.remove('sel')); cap.textContent = 'Tipp auf eine Nummer.'; };
+      cap.append(r);
     });
   });
   s.append(h('div', { class: 'row', style: { marginTop: '14px', gap: '10px' } },
@@ -431,13 +435,17 @@ function explore(did) {
     el.onclick = () => { v.classList.remove('blur'); pickPart(p); };
     legend.append(el);
   });
+  const whole = h('button', { class: 'btn ghost small', style: { marginTop: '12px', display: 'none' } }, ico('shrink'), 'Ganzes Bild');
+  whole.onclick = () => { zoomTo(d, []); highlight(d, []); $$('.mk', d).forEach((x) => x.classList.remove('sel')); whole.style.display = 'none'; };
   function pickPart(p) {
     $$('.mk', d).forEach((x) => x.classList.toggle('sel', x.dataset.part === p.id));
     highlight(d, [p.id]); snd.tap();
+    zoomTo(d, [p.id]); whole.style.display = '';
     cap.innerHTML = `<b>${nums[p.id]} · ${esc(p.name)}</b><br>${esc(p.info)}`;
+    d.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
   d.addEventListener('click', (e) => { const mk = e.target.closest('.mk'); if (mk) pickPart(partById(did, mk.dataset.part)); });
-  s.append(tog, legend);
+  s.append(h('div', { class: 'row wrap', style: { gap: '8px' } }, tog, whole), legend);
   const ch = CHAPTERS.find((c) => c.q.some((q) => q.t === 'label' && q.d === did));
   if (ch) s.append(h('a', { class: 'btn block', style: { marginTop: '14px' }, href: `#/ueben/${ch.id}/1` }, ico('star'), 'Beschriften üben'));
   app.append(s);
@@ -457,22 +465,54 @@ function film(id) {
   const playBtn = h('button', { class: 'btn small', style: { minWidth: '124px' } });
   const prev = h('button', { class: 'iconbtn', title: 'Zurück', html: I('prev') }), next = h('button', { class: 'iconbtn', title: 'Weiter', html: I('next') });
   const voiceBtn = h('button', { class: 'iconbtn', 'aria-pressed': String(S.settings.voice), title: 'Stimme an/aus', html: I('voice') });
+  const bigBtn = h('button', { class: 'iconbtn', title: 'Vergrößern', html: I('expand') });
   setPlay('play', 'Abspielen');
-  s.append(h('div', { class: 'player' }, stage, sub, h('div', { class: 'ctrl' }, prev, playBtn, next, h('div', { class: 'bar' }, bar), voiceBtn)),
-    voiceHint());
+  const player = h('div', { class: 'player' }, stage, sub, h('div', { class: 'ctrl' }, prev, playBtn, next, h('div', { class: 'bar' }, bar), voiceBtn, bigBtn));
+  bigBtn.onclick = () => {
+    const on = !player.classList.contains('full');
+    player.classList.toggle('full', on); document.body.classList.toggle('noscroll', on);
+    bigBtn.innerHTML = I(on ? 'shrink' : 'expand'); bigBtn.title = on ? 'Verkleinern' : 'Vergrößern';
+    setTimeout(() => show(i, true), 60);
+  };
+  s.append(player, voiceHint());
+  // what to do next: practice links right under the film
+  const practice = h('div', { class: 'modes' });
+  const pm = (ic, t, sub, href) => h('a', { class: 'mode', href, style: { '--c': ch.color } }, h('div', { class: 'ic', html: I(ic) }), h('div', null, h('b', null, t), h('span', { class: 'sub' }, sub)), h('span', { class: 'go', html: I('chevR') }));
+  practice.append(
+    pm('star', 'Stufe 1: Antippen', 'gleich nach dem Film am besten', `#/ueben/${id}/1`),
+    pm('pen', 'Stufe 2: Eintippen', 'selbst schreiben wie im Test', `#/ueben/${id}/2`),
+    ...WORKSHEETS.map((w, k) => (w.ch === id ? pm('clipboard', `Heft ${w.page}: alle Aufgaben`, w.title, '#/blatt/' + k) : null)).filter(Boolean),
+    pm('cards', 'Steckbrief-Karten', 'alles kurz auf einen Blick', '#/karten/' + id),
+    pm('book', 'Lernkarte', 'zum Nachlesen, mit Merksätzen', '#/lernen/' + id),
+    pm('clock', 'Probearbeit', '20 Minuten, mit Note', '#/probe'),
+  );
+  s.append(h('div', { class: 'section-title' }, ico('target'), 'Jetzt üben'), practice);
   if (ch.yt && ch.yt.length) s.append(h('div', { class: 'section-title' }, ico('play'), 'Mehr Erklärvideos zu diesem Thema'), videoList(ch.yt));
   app.append(s);
   function setPlay(ic, label) { playBtn.replaceChildren(ico(ic), label); }
-  function show(k) {
+  let lastD = null, lastVB = null;
+  function show(k, keepView) {
     i = clamp(k, 0, scenes.length - 1);
     const sc = scenes[i];
     stage.innerHTML = '';
     stage.append(h('div', { class: 'title' }, `${i + 1} / ${scenes.length}`));
     let inner;
-    if (sc.d) { inner = h('div', { class: 'scene diagram', html: diagramSVG(sc.d, { markers: false, arrow: sc.d === 'neuron' }) }); highlight(inner, sc.hl || []); }
+    if (sc.d) {
+      inner = h('div', { class: 'scene diagram', html: diagramSVG(sc.d, { markers: false, arrow: sc.d === 'neuron' }) }); highlight(inner, sc.hl || []);
+      const names = (sc.hl || []).map((pid) => DIAGRAMS[sc.d].parts.find((p) => p.id === pid)?.name).filter(Boolean);
+      if (names.length) stage.append(h('div', { class: 'focuschip' }, ico('target'), 'Im Fokus: ' + names.join(' · ')));
+    }
     else if (sc.big) inner = h('div', { class: 'scene' }, h('div', { class: 'bigtext' }, h('div', { class: 'bt', html: esc(sc.big).replace(/\n/g, '<br>') }), h('div', { class: 'mini', html: docSVG('happy') })));
     else { const c = sc.cat === 'doc' ? docSVG('happy', ['mirror']) : sc.cat === 'sick' ? catPic(catById(ch.cat), 'sick', ['thermo']) : catPic(catById(sc.cat) || catById(ch.cat), 'happy'); inner = h('div', { class: 'scene', html: `<div style="width:60%;max-width:280px">${c}</div>` }); }
     stage.append(inner);
+    if (sc.d) {
+      const svg = inner.querySelector('svg');
+      const from = lastD === sc.d && lastVB && !keepView ? lastVB : null;
+      if (from) svg.setAttribute('viewBox', from.join(' '));
+      const box = stage.getBoundingClientRect();
+      lastVB = zoomTo(inner, sc.hl || [], { from: from || undefined, aspect: box.width / Math.max(1, box.height - 20), minFrac: 0.38, duration: from ? 800 : 900 });
+      lastD = sc.d;
+    } else { lastD = null; lastVB = null; }
     sub.textContent = sc.say;
     bar.style.width = Math.round(((i + 1) / scenes.length) * 100) + '%';
   }
@@ -505,7 +545,7 @@ function film(id) {
   next.onclick = () => { voice.stop(); clearTimeout(timer); show(i + 1); if (playing) run(); };
   voiceBtn.onclick = () => { S.settings.voice = !S.settings.voice; save(); voiceBtn.setAttribute('aria-pressed', String(S.settings.voice)); };
   show(0);
-  cleanup = () => { playing = false; clearTimeout(timer); voice.stop(); snd.duck(false); };
+  cleanup = () => { playing = false; clearTimeout(timer); voice.stop(); snd.duck(false); document.body.classList.remove('noscroll'); };
 }
 
 function voiceHint() {
