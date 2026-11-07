@@ -141,6 +141,14 @@ function explainMore(q, res) {
   return `<div class="howto"><div class="howto-t">${I('bulb')} So funktioniert’s</div>${items.map((x) => `<div>${x}</div>`).join('')}</div>`;
 }
 
+function videoList(list) {
+  const c = h('div', { class: 'card' });
+  list.forEach((v) => c.append(h('a', { class: 'yt', href: v.url, target: '_blank', rel: 'noopener' },
+    h('div', { class: 'play' + (v.kind === 'web' ? ' web' : v.kind === 'search' ? ' search' : ''), html: I(v.kind === 'web' ? 'doc' : v.kind === 'search' ? 'target' : 'play') }),
+    h('div', null, h('b', null, v.title), h('span', null, v.ch)))));
+  return c;
+}
+
 /* ================= router ================= */
 const routes = [
   [/^#?\/?$/, home],
@@ -153,6 +161,8 @@ const routes = [
   [/^#\/mix\/los$/, () => quiz({ mix: true })],
   [/^#\/stoff$/, stoff],
   [/^#\/glossar$/, () => glossary()],
+  [/^#\/videos$/, () => videosPage()],
+  [/^#\/videos\/([\w-]+)$/, (c) => videosPage(c)],
   [/^#\/glossar\/([\w-]+)$/, (c) => glossary(c)],
   [/^#\/nochmal$/, () => quiz({ retry: true })],
   [/^#\/show$/, showIntro],
@@ -261,6 +271,7 @@ function topics() {
   const s = h('div', { class: 'screen' });
   s.append(h('h1', null, 'Kapitel'), h('p', { class: 'muted' }, 'Deine 11 Seiten in 10 Kapiteln. Jede Katze wird gesund, wenn du ihr Kapitel kannst.'));
   s.append(h('a', { class: 'card linkcard', href: '#/stoff' }, h('div', { class: 'ic', html: I('clipboard') }), h('div', null, h('b', null, 'Prüfstoff Seite für Seite'), h('span', { class: 'small muted' }, 'Alle Aufgaben aus dem Heft')), h('span', { class: 'go', html: I('chevR') })));
+  s.append(h('a', { class: 'card linkcard', href: '#/videos' }, h('div', { class: 'ic', style: { background: '#fde3e3', color: '#e62d2d' }, html: I('play') }), h('div', null, h('b', null, 'Alle Erklärvideos'), h('span', { class: 'small muted' }, 'YouTube und Co., nach Kapitel sortiert')), h('span', { class: 'go', html: I('chevR') })));
   s.append(h('a', { class: 'card linkcard', href: '#/glossar', style: { marginBottom: '14px' } }, h('div', { class: 'ic', style: { background: 'var(--lav-soft)', color: 'var(--lav)' }, html: I('book') }), h('div', null, h('b', null, 'Glossar A–Z'), h('span', { class: 'small muted' }, `${GLOSSARY.length} Fachbegriffe, mit Karteikarten`)), h('span', { class: 'go', html: I('chevR') })));
   const list = h('div', { class: 'modes' });
   CHAPTERS.forEach((ch, i) => {
@@ -296,6 +307,7 @@ function chapter(id) {
   modes.append(
     mode('cards', 'Steckbrief-Karten', `${(CARDS[id] || []).length} Karten, kurz und kompakt`, '#/karten/' + id),
     mode('film', 'Erklär-Film', st.video ? 'angeschaut · mit Stimme' : 'ca. 2 Minuten, mit Stimme', '#/film/' + id),
+    mode('play', 'Erklärvideos auf YouTube', `${(ch.yt || []).length} ausgewählte Videos und Texte`, '#/videos/' + id),
     mode('book', 'Lernkarte', st.learned ? 'gelesen · Merksätze und Korrekturen' : 'ausführlich, mit Merksätzen und Korrekturen', '#/lernen/' + id),
     mode('star', 'Stufe 1: Antippen', 'Auswählen, Zuordnen, Beschriften', `#/ueben/${id}/1`, Math.round(levelMastery(ch, 1) * 100)),
     mode('pen', 'Stufe 2: Eintippen', 'Selbst schreiben wie im Test', `#/ueben/${id}/2`, Math.round(levelMastery(ch, 2) * 100)),
@@ -307,8 +319,7 @@ function chapter(id) {
   s.append(modes);
   if (ch.yt && ch.yt.length) {
     s.append(h('div', { class: 'section-title' }, ico('play'), 'Gute Erklärvideos'));
-    const c = h('div', { class: 'card' });
-    ch.yt.forEach((v) => c.append(h('a', { class: 'yt', href: v.url, target: '_blank', rel: 'noopener' }, h('div', { class: 'play', html: I('play') }), h('div', null, h('b', null, v.title), h('span', null, v.ch)))));
+    const c = videoList(ch.yt);
     c.append(h('p', { class: 'small muted', style: { margin: '8px 0 0' } }, 'Die Videos gehen manchmal über dein Heft hinaus. Für den Test zählt dein Heft.'));
     s.append(c);
   }
@@ -449,6 +460,7 @@ function film(id) {
   setPlay('play', 'Abspielen');
   s.append(h('div', { class: 'player' }, stage, sub, h('div', { class: 'ctrl' }, prev, playBtn, next, h('div', { class: 'bar' }, bar), voiceBtn)),
     voiceHint());
+  if (ch.yt && ch.yt.length) s.append(h('div', { class: 'section-title' }, ico('play'), 'Mehr Erklärvideos zu diesem Thema'), videoList(ch.yt));
   app.append(s);
   function setPlay(ic, label) { playBtn.replaceChildren(ico(ic), label); }
   function show(k) {
@@ -857,6 +869,22 @@ function fullRun() {
     checkUnlocks();
   }
   cleanup = () => { $$('.sheet').forEach((x) => x.remove()); save(); snd.moodMusic(S.settings.track); };
+}
+
+/* ---------- Erklärvideos ---------- */
+function videosPage(cid) {
+  tabs('lernen');
+  const s = h('div', { class: 'screen' });
+  const one = cid ? chapterById(cid) : null;
+  s.append(back(one ? '#/k/' + one.id : '#/themen', one ? one.short : 'Kapitel'), h('h1', null, one ? 'Erklärvideos: ' + one.short : 'Alle Erklärvideos'));
+  s.append(h('p', { class: 'muted' }, 'Ausgewählte Videos von simpleclub, Studyflix, Learning Level Up und Co. Sie öffnen sich in einem neuen Fenster. Die Videos gehen manchmal über dein Heft hinaus: Für den Test zählt dein Heft.'));
+  (one ? [one] : CHAPTERS).forEach((ch) => {
+    if (!ch.yt || !ch.yt.length) return;
+    if (!one) s.append(h('div', { class: 'section-title', style: { color: ch.color } }, ico(CH_ICON[ch.id]), h('span', { style: { color: 'var(--ink)' } }, ch.title)));
+    s.append(videoList(ch.yt));
+  });
+  if (one) s.append(h('a', { class: 'btn ghost block', style: { marginTop: '14px' }, href: '#/videos' }, 'Alle Kapitel anzeigen'));
+  app.append(s);
 }
 
 /* ---------- Glossar ---------- */

@@ -1,5 +1,5 @@
 /* Schnurrologie: offline after the first visit. Network first for app files (new versions show at once), cache as fallback. */
-var CACHE = 'schnurr-v4';
+var CACHE = 'schnurr-v5';
 var SHELL = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/util.js', 'js/store.js', 'js/audio.js', 'js/cats.js', 'js/diagrams.js', 'js/content.js', 'js/engine.js', 'js/icons.js', 'js/voice.js', 'js/glossary.js', 'manifest.webmanifest', 'icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL.map(function (u) { return new Request(u, { cache: 'reload' }); })); }).then(function () { return self.skipWaiting(); }));

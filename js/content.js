@@ -468,7 +468,12 @@ Enzyme erkennst du an der Endung <b>-ase</b>: Malt<b>ase</b> spaltet Malt<b>ose<
       { big: 'Laktose ➜ Laktase fehlt', say: 'Bei Laktoseintoleranz fehlt Laktase, bei Histaminintoleranz D A O, und bei der erblichen Fruktoseintoleranz Aldolase B.' },
       { cat: 'kiki', say: 'Übrigens: Viele Katzen vertragen keine Kuhmilch, weil ihnen die Laktase fehlt!' },
     ],
-    yt: [],
+    yt: [
+      { title: 'Zöliakie: verständlich erklärt', ch: 'gesundheit.gv.at (Text, Österreich)', url: 'https://www.gesundheit.gv.at/krankheiten/allergie/nahrungsmittelallergie/zoeliakie.html', kind: 'web' },
+      { title: 'Zöliakie in Einfacher Sprache', ch: 'Apotheken Umschau (Text)', url: 'https://www.apotheken-umschau.de/einfache-sprache/krankheiten/zoeliakie-960937.html', kind: 'web' },
+      { title: 'Laktoseintoleranz: Was ist das?', ch: 'gesundheit.gv.at (Text, Österreich)', url: 'https://www.gesundheit.gv.at/krankheiten/stoffwechsel/nahrungsmittelunvertraeglichkeit/laktoseintoleranz.html', kind: 'web' },
+      { title: 'Videos zu Zöliakie suchen', ch: 'YouTube-Suche', url: 'https://www.youtube.com/results?search_query=Z%C3%B6liakie+Darmzotten+einfach+erkl%C3%A4rt', kind: 'search' },
+    ],
     q: [
       F('Bei Zöliakie verträgt man welchen Stoff nicht?', 'Gluten', ['Klebereiweiß', 'Klebereiweiss'], ['Laktose', 'Fruktose', 'Histamin'], 'Gluten = Klebereiweiß im Getreide.'),
       MC('Was passiert bei Zöliakie mit den Darmzotten?', 'Sie werden kleiner und flacher', ['Sie werden länger', 'Sie bekommen mehr Mikrovilli', 'Nichts']),
