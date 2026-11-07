@@ -602,3 +602,22 @@ body.noscroll { overflow: hidden; }
 .diagram svg { transition: none; }
 .player .stage .focuschip svg.ico { width: 15px; height: 15px; flex: none; }
 .player .stage .title svg { width: auto; height: auto; }
+
+/* test builder */
+.chip.toggle { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+.chip.toggle .ico { width: 15px; height: 15px; color: var(--c, var(--primary)); }
+.chip.toggle.on { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
+.chip.toggle.on .ico { color: inherit; }
+.segs.wrapsegs { display: flex; flex-wrap: wrap; }
+.segs.wrapsegs .seg { flex: 1 1 auto; justify-content: center; }
+
+.chres { display: grid; grid-template-columns: 30px 1fr 90px 46px; gap: 8px; align-items: center; padding: 7px 0; border-bottom: 1px dashed var(--line); text-decoration: none; color: var(--ink); }
+.chres:last-child { border-bottom: 0; }
+.chres .n { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 14%, var(--card)); color: var(--c); }
+.chres .n .ico { width: 16px; height: 16px; }
+.chres b { font-size: .92rem; }
+.chres .bar { height: 8px; }
+.chres .pc { font-weight: 800; font-size: .86rem; text-align: right; font-variant-numeric: tabular-nums; }
+
+.chip.toggle { padding: 8px 12px; border: 1px solid var(--line); background: var(--card); border-radius: 99px; font-weight: 700; font-size: .9rem; }
+.chip.toggle.on { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }

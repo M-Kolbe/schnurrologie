@@ -170,6 +170,10 @@ const routes = [
   [/^#\/alle$/, fullIntro],
   [/^#\/alle\/los$/, fullRun],
   [/^#\/blatt\/(\d+)$/, (i) => quiz({ sheet: +i })],
+  [/^#\/test$/, () => testBuilder()],
+  [/^#\/test\/los$/, () => testStart()],
+  [/^#\/test\/weiter$/, () => testResume()],
+  [/^#\/test\/([\w-]+)$/, (c) => testBuilder(c)],
   [/^#\/probe$/, probeIntro],
   [/^#\/probe\/los$/, probeRun],
   [/^#\/bild\/([\w-]+)$/, explore],
@@ -311,6 +315,7 @@ function chapter(id) {
     mode('book', 'Lernkarte', st.learned ? 'gelesen · Merksätze und Korrekturen' : 'ausführlich, mit Merksätzen und Korrekturen', '#/lernen/' + id),
     mode('star', 'Stufe 1: Antippen', 'Auswählen, Zuordnen, Beschriften', `#/ueben/${id}/1`, Math.round(levelMastery(ch, 1) * 100)),
     mode('pen', 'Stufe 2: Eintippen', 'Selbst schreiben wie im Test', `#/ueben/${id}/2`, Math.round(levelMastery(ch, 2) * 100)),
+    mode('clipboard', 'Kapitel-Test', 'zufällige Fragen, mit Note am Ende', '#/test/' + id),
   );
   WORKSHEETS.forEach((w, i) => { if (w.ch === id) modes.append(mode('clipboard', `Heft ${w.page}: alle Aufgaben`, w.title, '#/blatt/' + i, Math.round(sheetProgress(w) * 100))); });
   const dias = [...new Set(ch.q.filter((q) => q.t === 'label').map((q) => q.d))];
@@ -484,6 +489,7 @@ function film(id) {
     ...WORKSHEETS.map((w, k) => (w.ch === id ? pm('clipboard', `Heft ${w.page}: alle Aufgaben`, w.title, '#/blatt/' + k) : null)).filter(Boolean),
     pm('cards', 'Steckbrief-Karten', 'alles kurz auf einen Blick', '#/karten/' + id),
     pm('book', 'Lernkarte', 'zum Nachlesen, mit Merksätzen', '#/lernen/' + id),
+    pm('clipboard', 'Kapitel-Test', 'zufällige Fragen, mit Note', '#/test/' + id),
     pm('clock', 'Probearbeit', '20 Minuten, mit Note', '#/probe'),
   );
   s.append(h('div', { class: 'section-title' }, ico('target'), 'Jetzt üben'), practice);
@@ -570,6 +576,7 @@ function mixIntro() {
       h('li', null, ico('flame'), h('span', null, 'Ab 3 richtigen in Folge gibt es Bonus-Leckerli.'))),
     h('a', { class: 'btn block', href: '#/mix/los' }, ico('bolt'), 'Runde starten')));
   s.append(h('div', { class: 'section-title' }, ico('trophy'), 'Das große Bio-Quiz'));
+  s.append(h('a', { class: 'card linkcard', href: '#/test', style: { marginBottom: '10px' } }, h('div', { class: 'ic', style: { background: 'var(--lav-soft)', color: 'var(--lav)' }, html: I('clipboard') }), h('div', null, h('b', null, 'Test-Baukasten'), h('span', { class: 'small muted' }, 'Zufällige Tests: gesamt oder pro Kapitel, 10 bis alle Fragen, mit Note · Komplett-Check')), h('span', { class: 'go', html: I('chevR') })));
   const fp = S.full && S.full.order ? Math.min(S.full.pos, S.full.order.length) : 0;
   s.append(h('div', { class: 'modes' },
     h('a', { class: 'mode', href: '#/show', style: { '--c': 'var(--sun)' } }, h('div', { class: 'ic', html: I('trophy') }), h('div', null, h('b', null, 'Wer wird Tierärztin?'), h('span', { class: 'sub' }, '15 Fragen, immer schwerer · 3 Joker · 3 Leben')), h('span', { class: 'go', html: I('chevR') })),
@@ -582,7 +589,7 @@ function mixIntro() {
   app.append(s);
 }
 
-function quiz({ chapter: cid, level, mix, sheet: sheetIdx, retry }) {
+function quiz({ chapter: cid, level, mix, sheet: sheetIdx, retry, custom }) {
   focusMode(true);
   tabs('ueben');
   let queue, backHref = '#/', title = '';
@@ -594,6 +601,8 @@ function quiz({ chapter: cid, level, mix, sheet: sheetIdx, retry }) {
     }
     queue = shuffle(shuffle(pool).sort((a, b) => item(itemKey(a.q, a.level)).box - item(itemKey(b.q, b.level)).box).slice(0, 10));
     backHref = '#/mix'; title = 'Schnell-Runde';
+  } else if (custom) {
+    queue = custom.items; backHref = '#/test'; title = custom.title;
   } else if (retry) {
     queue = (S.retry || []).map((x) => ({ q: QBYID[x.id], level: x.level })).filter((x) => x.q);
     backHref = '#/mix'; title = 'Fehler nochmal';
@@ -1038,48 +1047,72 @@ function buildProbe() {
 }
 
 function probeRun() {
+  runExam({ items: buildProbe(), minutes: 20, title: 'Probearbeit', againHref: '#/probe', history: true });
+}
+
+/* A test with a grade at the end: no feedback in between, full solutions afterwards. */
+function runExam({ items, minutes, title, againHref, history, resume }) {
+  const long = items.length > 30;
+  if (long) minutes = 0;
   focusMode(true);
   tabs('ueben');
   snd.moodMusic('focus');
-  const items = buildProbe();
   const max = items.reduce((a, b) => a + b.pts, 0);
-  const results = [];
-  let pos = 0, left = 20 * 60;
+  const results = resume ? resume.results : [];
+  let pos = resume ? resume.pos : 0, left = (minutes || 0) * 60;
+  const persist = () => {
+    if (!long) return;
+    S.examRun = { title, againHref, pos, items: items.map((it) => ({ id: it.q.id, level: it.level, pts: it.pts })), results: results.map((r) => ({ k: r.k, score: r.res.score, ok: r.res.ok, you: r.res.you || '', html: r.res.html || '', detail: r.res.detail || null })) };
+    save();
+  };
   const s = h('div', { class: 'screen' });
-  const clock = h('div', { class: 'combo', style: { minWidth: '76px', color: 'var(--ink)' } }, ico('clock'), '20:00');
+  const fmt = (sec) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+  const clock = h('div', { class: 'combo', style: { minWidth: '76px', color: 'var(--ink)' } }, ico('clock'), minutes ? fmt(left) : '0:00');
   const barI = h('i', { style: { width: '0%' } });
-  s.append(h('div', { class: 'qtop' }, h('button', { class: 'close', title: 'Abbrechen', html: I('x'), onclick: () => ask('Probearbeit abbrechen?', 'Ja, abbrechen', () => nav('#/probe')) }), h('div', { class: 'bar accent' }, barI), clock));
+  const closeBtn = long
+    ? h('button', { class: 'close', title: 'Pause', html: I('pause'), onclick: () => { persist(); toast('Gespeichert. Du kannst später genau hier weitermachen.'); nav(againHref); } })
+    : h('button', { class: 'close', title: 'Abbrechen', html: I('x'), onclick: () => ask(title + ' abbrechen?', 'Ja, abbrechen', () => nav(againHref)) });
+  s.append(h('div', { class: 'qtop' }, closeBtn, h('div', { class: 'bar accent' }, barI), clock));
   const body = h('div');
   s.append(body);
   app.append(s);
+  let up = 0;
   const tick = setInterval(() => {
+    if (!minutes) { up++; clock.replaceChildren(ico('clock'), fmt(up)); return; }
     left--;
-    clock.replaceChildren(ico('clock'), `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`);
+    clock.replaceChildren(ico('clock'), fmt(left));
     if (left === 60) { toast('Noch 1 Minute!'); snd.mrrp(); }
     if (left <= 0) { clearInterval(tick); finish(true); }
   }, 1000);
-  cleanup = () => { clearInterval(tick); snd.moodMusic(S.settings.track); };
+  results.forEach((r) => { if (!r.it) { r.it = items[r.k]; r.res = r.res || { score: r.score, ok: r.ok, you: r.you, html: r.html, detail: r.detail }; } });
+  cleanup = () => { clearInterval(tick); persist(); snd.moodMusic(S.settings.track); };
   show();
   function show() {
     if (pos >= items.length) return finish(false);
     const it = items[pos];
     body.innerHTML = '';
-    body.append(h('div', { class: 'qmeta' }, h('span', null, `Aufgabe ${pos + 1} von ${items.length}`), h('span', null, `${it.pts} ${it.pts === 1 ? 'Punkt' : 'Punkte'}`)));
+    const chq = chapterById(it.q.ch);
+    body.append(h('div', { class: 'qmeta' }, h('span', null, `${title} · Aufgabe ${pos + 1} von ${items.length}`), h('span', null, chq ? `${chq.short} · ` : '', `${it.pts} ${it.pts === 1 ? 'Punkt' : 'Punkte'}`)));
+    barI.style.width = Math.round((pos / items.length) * 100) + '%';
     body.append(renderQuestion(it.q, { level: it.level, exam: true, done: (res) => {
-      results.push({ it, res });
+      results.push({ k: pos, it, res });
       if (it.q.ch) record(itemKey(it.q, it.level), res.ok, res.score);
-      setTimeout(() => { pos++; barI.style.width = Math.round((pos / items.length) * 100) + '%'; show(); }, res.selfChecked ? 300 : 650);
+      setTimeout(() => { pos++; persist(); barI.style.width = Math.round((pos / items.length) * 100) + '%'; show(); }, res.selfChecked ? 300 : 650);
     } }));
   }
   function finish(timeUp) {
     clearInterval(tick);
+    if (long) { delete S.examRun; save(); }
+    cleanup = () => snd.moodMusic(S.settings.track);
     clock.replaceChildren(ico('check'));
     focusMode(false);
     const points = Math.round(results.reduce((a, r) => a + r.res.score * r.it.pts, 0) * 2) / 2;
     const pct = Math.round((points / max) * 100);
     const grade = pct >= 90 ? 1 : pct >= 80 ? 2 : pct >= 65 ? 3 : pct >= 50 ? 4 : 5;
     const names = ['', 'Sehr gut', 'Gut', 'Befriedigend', 'Genügend', 'Nicht genügend'];
-    S.probe.push({ date: new Date().toLocaleDateString('de-AT'), pct, grade, points, max });
+    if (history) S.probe.push({ date: new Date().toLocaleDateString('de-AT'), pct, grade, points, max });
+    else (S.tests = S.tests || []).push({ date: new Date().toLocaleDateString('de-AT'), title, pct, grade, points, max });
+    S.retry = results.filter((r) => r.res.score < 0.99 && r.it.q.ch).map((r) => ({ id: r.it.q.id, level: r.it.level }));
     gainXP(Math.round(points * 5));
     save();
     snd.moodMusic(S.settings.track);
@@ -1092,6 +1125,16 @@ function probeRun() {
       h('h2', null, names[grade]),
       h('div', { class: 'stats' }, h('div', { class: 'stat' }, h('b', null, `${points}/${max}`), h('span', null, 'Punkte')), h('div', { class: 'stat' }, h('b', null, pct + ' %'), h('span', null, 'erreicht')), h('div', { class: 'stat' }, h('b', null, '+' + Math.round(points * 5)), h('span', null, 'Leckerli'))),
       h('p', { class: 'muted' }, grade <= 2 ? 'So kannst du am Freitag ganz entspannt hineingehen.' : 'Schau dir unten die Lösungen an und übe die Kapitel mit den meisten Fehlern nochmal.')));
+    // per chapter: where does it still go wrong?
+    const byCh = {};
+    results.forEach(({ it, res }) => { const c = it.q.ch || 'enzyme'; byCh[c] = byCh[c] || { got: 0, max: 0 }; byCh[c].got += res.score * it.pts; byCh[c].max += it.pts; });
+    if (Object.keys(byCh).length > 1) {
+      body.append(h('div', { class: 'section-title' }, ico('list'), 'Ergebnis pro Kapitel'));
+      const t = h('div', { class: 'card' });
+      CHAPTERS.forEach((ch) => { const v = byCh[ch.id]; if (!v) return; const pc = Math.round((v.got / v.max) * 100);
+        t.append(h('a', { class: 'chres', href: '#/k/' + ch.id, style: { '--c': ch.color } }, h('span', { class: 'n', html: I(CH_ICON[ch.id]) }), h('b', null, ch.short), h('div', { class: 'bar' }, h('i', { style: { width: pc + '%', background: pc >= 80 ? 'var(--good)' : pc >= 50 ? 'var(--sun)' : 'var(--bad)' } })), h('span', { class: 'pc' }, pc + ' %'))); });
+      body.append(t);
+    }
     body.append(h('div', { class: 'section-title' }, ico('list'), 'Auflösung'));
     results.forEach(({ it, res }, k) => {
       const ok = res.score >= 0.99;
@@ -1101,9 +1144,116 @@ function probeRun() {
         h('b', null, it.q.q || ''),
         h('div', { class: 'small', style: { marginTop: '6px' }, html: (res.you ? `Deine Antwort: ${esc(res.you)}<br>` : '') + (res.html || '') + det + explainMore(it.q, res) })));
     });
-    body.append(h('div', { class: 'stack', style: { marginTop: '14px' } }, h('a', { class: 'btn lav block', href: '#/probe' }, ico('refresh'), 'Nochmal mit neuen Aufgaben'), h('a', { class: 'btn ghost block', href: '#/' }, 'Zur Klinik')));
+    body.append(h('div', { class: 'stack', style: { marginTop: '14px' } },
+      S.retry.length ? h('a', { class: 'btn coral block', href: '#/nochmal' }, ico('target'), `Nur die ${S.retry.length} Fehler nochmal üben`) : null,
+      h('a', { class: 'btn lav block', href: againHref }, ico('refresh'), 'Nochmal mit neuen Aufgaben'), h('a', { class: 'btn ghost block', href: '#/' }, 'Zur Klinik')));
     checkUnlocks();
   }
+}
+
+
+/* ================= Test-Baukasten: random tests, per chapter or overall ================= */
+const PTS = { label: 3, grid: 3, explain: 2, cloze: 2, formula: 2, match: 2, sort: 2 };
+function buildTest(cfg) {
+  const pool = [];
+  for (const ch of CHAPTERS) {
+    if (!cfg.chapters.includes(ch.id)) continue;
+    for (const q of ch.q) {
+      const can1 = usableAt(q, 1), can2 = usableAt(q, 2);
+      let level = null;
+      if (cfg.style === 'tap') level = can1 ? 1 : null;
+      else if (cfg.style === 'type') level = can2 && !['tf', 'order', 'pick'].includes(q.t) ? 2 : null;
+      else level = can1 && can2 ? (Math.random() < 0.5 ? 1 : 2) : can1 ? 1 : 2;
+      if (level) pool.push({ q, level, pts: PTS[q.t] || 1 });
+    }
+  }
+  if (cfg.chapters.includes('enzyme') && cfg.style !== 'tap') pool.push({ q: { t: 'grid', id: 'test-grid', q: 'Ergänze die Lücken in der Enzym-Tabelle.' }, level: 2, pts: 3 });
+  const picked = shuffle(pool);
+  return cfg.n === 'all' ? picked : picked.slice(0, cfg.n);
+}
+let pendingTest = null;
+function testBuilder(preCh) {
+  tabs('ueben');
+  const cfg = Object.assign({ chapters: CHAPTERS.map((c) => c.id), n: 20, style: 'mix', mode: 'exam', timer: false }, S.testCfg || {});
+  if (preCh && chapterById(preCh)) { cfg.chapters = [preCh]; cfg.n = 12; }
+  const s = h('div', { class: 'screen' });
+  s.append(back(preCh ? '#/k/' + preCh : '#/mix', preCh ? chapterById(preCh).short : 'Üben'), h('h1', null, 'Test-Baukasten'),
+    h('p', { class: 'muted' }, 'Stell dir deinen eigenen Test zusammen. Die Fragen werden jedes Mal neu zufällig gezogen.'));
+  if (S.examRun) {
+    const R = S.examRun;
+    s.append(h('div', { class: 'card tint-lav', style: { marginBottom: '12px' } }, h('b', null, R.title + ' läuft noch'),
+      h('div', { class: 'bar', style: { margin: '8px 0' } }, h('i', { style: { width: Math.round((R.pos / R.items.length) * 100) + '%' } })),
+      h('p', { class: 'small muted' }, `Aufgabe ${R.pos + 1} von ${R.items.length}. Dein Fortschritt ist gespeichert.`),
+      h('div', { class: 'row wrap' }, h('a', { class: 'btn lav small', href: '#/test/weiter' }, ico('play'), 'Weitermachen'),
+        h('button', { class: 'btn ghost small', onclick: () => ask('Laufenden Test verwerfen?', 'Ja, verwerfen', () => { delete S.examRun; save(); route(); }) }, 'Verwerfen'))));
+  }
+  s.append(h('button', { class: 'card linkcard', style: { width: '100%', textAlign: 'left', marginBottom: '12px', border: '2px solid var(--lav)' }, onclick: () => { S.testCfg = { chapters: CHAPTERS.map((c) => c.id), n: 'all', style: 'mix', mode: 'exam', timer: false }; save(); nav('#/test/los'); } },
+    h('div', { class: 'ic', style: { background: 'var(--lav)', color: '#fff' }, html: I('trophy') }),
+    h('div', null, h('b', null, 'Der Komplett-Check'), h('span', { class: 'small muted' }, `Alle ${buildTest({ chapters: CHAPTERS.map((c) => c.id), n: 'all', style: 'mix' }).length} Aufgaben des Prüfstoffs in zufälliger Reihenfolge, Note am Ende, Ergebnis pro Kapitel. Pausieren jederzeit möglich.`)),
+    h('span', { class: 'go', html: I('chevR') })));
+  const card = h('div', { class: 'card stack' });
+  // chapters
+  const chips = h('div', { class: 'chips' });
+  const allChip = h('button', { class: 'chip toggle' }, 'Alle Kapitel');
+  const chipEls = CHAPTERS.map((ch) => { const b = h('button', { class: 'chip toggle', style: { '--c': ch.color } }, ico(CH_ICON[ch.id]), ch.short); b.onclick = () => { const k = cfg.chapters.indexOf(ch.id); if (k >= 0) cfg.chapters.splice(k, 1); else cfg.chapters.push(ch.id); upd(); }; return b; });
+  allChip.onclick = () => { cfg.chapters = cfg.chapters.length === CHAPTERS.length ? [] : CHAPTERS.map((c) => c.id); upd(); };
+  chips.append(allChip, ...chipEls);
+  const seg = (key, opts) => { const w = h('div', { class: 'segs wrapsegs' }); opts.forEach(([v, label]) => { const b = h('button', { class: 'seg' }, label); b.onclick = () => { cfg[key] = v; upd(); }; b.dataset.v = String(v); w.append(b); }); w.dataset.key = key; return w; };
+  const nSeg = seg('n', [[10, '10'], [20, '20'], [30, '30'], ['all', 'Alle']]);
+  const styleSeg = seg('style', [['tap', 'Antippen'], ['type', 'Eintippen'], ['mix', 'Gemischt']]);
+  const modeSeg = seg('mode', [['exam', 'Wie ein Test (Note am Ende)'], ['learn', 'Üben mit Erklärung']]);
+  const timer = h('label', { class: 'toggle', for: 'test-timer' }, h('span', null, 'Mit 20-Minuten-Uhr'), h('input', { type: 'checkbox', id: 'test-timer' }));
+  timer.querySelector('input').onchange = (e) => { cfg.timer = e.target.checked; };
+  const info = h('p', { class: 'small muted', style: { margin: 0 } });
+  const start = h('button', { class: 'btn lav block' }, ico('clipboard'), 'Test starten');
+  start.onclick = () => { S.testCfg = { ...cfg, chapters: cfg.chapters.slice() }; save(); nav('#/test/los'); };
+  card.append(h('div', { class: 'eyebrow' }, 'Welche Kapitel?'), chips,
+    h('div', { class: 'eyebrow' }, 'Wie viele Fragen?'), nSeg,
+    h('div', { class: 'eyebrow' }, 'Wie antworten?'), styleSeg,
+    h('div', { class: 'eyebrow' }, 'Wie prüfen?'), modeSeg, timer, info, start);
+  s.append(card);
+  const quick = h('div', { class: 'modes', style: { marginTop: '14px' } });
+  const qk = (t, sub, c) => h('button', { class: 'mode', onclick: () => { S.testCfg = { ...cfg, ...c }; save(); nav('#/test/los'); } }, h('div', { class: 'ic', html: I('bolt') }), h('div', null, h('b', null, t), h('span', { class: 'sub' }, sub)), h('span', { class: 'go', html: I('chevR') }));
+  quick.append(
+    qk('Großer Gesamttest', '30 zufällige Fragen aus allem, gemischt, mit Note', { chapters: CHAPTERS.map((c) => c.id), n: 30, style: 'mix', mode: 'exam', timer: false }),
+    qk('Alles eintippen', '20 Fragen aus allem, nur selbst schreiben', { chapters: CHAPTERS.map((c) => c.id), n: 20, style: 'type', mode: 'exam', timer: false }),
+    qk('Nur Nervenzelle', '12 Fragen, gemischt, mit Note', { chapters: ['neuron'], n: 12, style: 'mix', mode: 'exam', timer: false }),
+    qk('Nur Verdauung', '20 Fragen ohne Nervenzelle', { chapters: CHAPTERS.filter((c) => c.id !== 'neuron').map((c) => c.id), n: 20, style: 'mix', mode: 'exam', timer: false }),
+  );
+  s.append(h('div', { class: 'section-title' }, ico('sparkle'), 'Schnellstart'), quick);
+  if (S.tests && S.tests.length) {
+    s.append(h('div', { class: 'section-title' }, ico('trophy'), 'Deine letzten Tests'));
+    const c = h('div', { class: 'card' });
+    S.tests.slice(-6).reverse().forEach((t) => c.append(h('div', { class: 'task' }, h('b', null, 'Note ' + t.grade), h('span', null, `${t.pct} % · ${t.points}/${t.max} P. · ${t.date}`))));
+    s.append(c);
+  }
+  app.append(s);
+  upd();
+  function upd() {
+    allChip.classList.toggle('on', cfg.chapters.length === CHAPTERS.length);
+    chipEls.forEach((b, k) => b.classList.toggle('on', cfg.chapters.includes(CHAPTERS[k].id)));
+    [nSeg, styleSeg, modeSeg].forEach((w) => w.querySelectorAll('.seg').forEach((b) => b.classList.toggle('on', b.dataset.v === String(cfg[w.dataset.key]))));
+    timer.style.display = cfg.mode === 'exam' && cfg.n !== 'all' && cfg.n <= 30 ? '' : 'none';
+    const avail = buildTest({ ...cfg, n: 'all' }).length;
+    const n = cfg.n === 'all' ? avail : Math.min(cfg.n, avail);
+    info.textContent = cfg.chapters.length ? `${n} Fragen aus ${cfg.chapters.length === CHAPTERS.length ? 'allen Kapiteln' : cfg.chapters.length + (cfg.chapters.length === 1 ? ' Kapitel' : ' Kapiteln')} (insgesamt ${avail} passende Fragen).` : 'Wähle mindestens ein Kapitel.';
+    start.disabled = !cfg.chapters.length || !n;
+  }
+}
+function testResume() {
+  const R = S.examRun;
+  if (!R) return nav('#/test');
+  const items = R.items.map((x) => ({ q: x.id === 'test-grid' ? { t: 'grid', id: 'test-grid', q: 'Ergänze die Lücken in der Enzym-Tabelle.' } : QBYID[x.id], level: x.level, pts: x.pts })).filter((x) => x.q);
+  runExam({ items, minutes: 0, title: R.title, againHref: R.againHref || '#/test', history: false, resume: { pos: R.pos, results: R.results } });
+}
+function testStart() {
+  const cfg = S.testCfg;
+  if (!cfg || !cfg.chapters || !cfg.chapters.length) return nav('#/test');
+  const items = buildTest(cfg);
+  if (!items.length) return nav('#/test');
+  const title = cfg.chapters.length === 1 ? 'Kapitel-Test ' + chapterById(cfg.chapters[0]).short : cfg.chapters.length === CHAPTERS.length ? (cfg.n === 'all' ? 'Komplett-Check' : 'Gesamttest') : 'Test';
+  if (cfg.mode === 'learn') return quiz({ custom: { items, title } });
+  runExam({ items, minutes: cfg.timer ? 20 : 0, title, againHref: '#/test', history: false });
 }
 
 /* ================= collection, plan, settings ================= */
