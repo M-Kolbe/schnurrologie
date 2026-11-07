@@ -7,17 +7,17 @@ import * as snd from './audio.js';
 
 const TYPE_NAMES = {
   fact: 'Frage', mc: 'Auswahl', multi: 'Mehrere richtig', tf: 'Richtig oder falsch?', match: 'Zuordnen', order: 'Reihenfolge',
-  sort: 'Sortieren', cloze: 'Lückentext', label: 'Beschriften', grid: 'Tabelle', explain: 'Erklären',
+  sort: 'Sortieren', cloze: 'Lückentext', label: 'Beschriften', grid: 'Tabelle', explain: 'Erklären', formula: 'Zahnformel', pick: 'Bild-Frage',
 };
-const L1 = new Set(['fact', 'mc', 'multi', 'tf', 'match', 'order', 'sort', 'cloze', 'label', 'grid']);
-const L2 = new Set(['fact', 'cloze', 'label', 'grid', 'explain', 'tf', 'order']);
+const L1 = new Set(['fact', 'mc', 'multi', 'tf', 'match', 'order', 'sort', 'cloze', 'label', 'grid', 'formula', 'pick']);
+const L2 = new Set(['fact', 'cloze', 'label', 'grid', 'explain', 'tf', 'order', 'formula', 'pick']);
 export const usableAt = (q, level) => (level === 1 ? L1 : L2).has(q.t);
 
 /* Each renderer: render(q, ctx) -> element. ctx: { level, exam, done(result) }.
    result: { score 0..1, ok, html (feedback), answer (short text of the correct answer) } */
 export function renderQuestion(q, ctx) {
   const wrap = h('div', { class: 'qcard' });
-  const kind = h('div', { class: 'qkind' }, ctx.level === 2 && ['fact', 'cloze', 'label', 'grid'].includes(q.t) ? '✍️ Eintippen · ' : '', TYPE_NAMES[q.t] || '');
+  const kind = h('div', { class: 'qkind' }, ctx.level === 2 && ['fact', 'cloze', 'label', 'grid', 'formula'].includes(q.t) ? 'Eintippen · ' : '', TYPE_NAMES[q.t] || '');
   wrap.append(kind);
   const R = RENDER[q.t];
   R(q, ctx, wrap);
@@ -32,6 +32,71 @@ function actions(btnText, onClick, disabled = false) {
 }
 
 const RENDER = {
+  /* ---------- dental formula (Seite 4): fill the table ---------- */
+  formula(q, ctx, wrap) {
+    wrap.append(title(q.q));
+    const F = q.which === 'milch'
+      ? { cols: ['M', 'C', 'I', 'I', 'C', 'M'], row: [2, 1, 2, 2, 1, 2], total: 20, opts: [16, 20, 24, 28] }
+      : { cols: ['M', 'P', 'C', 'I', 'I', 'C', 'P', 'M'], row: [3, 2, 1, 2, 2, 1, 2, 3], total: 32, opts: [20, 28, 32, 36] };
+    const half = F.row.length / 2 - 1;
+    const table = h('table', { class: 'formula' });
+    table.append(h('tr', null, h('th', { class: 'side' }, ''), F.cols.map((c, i) => h('th', { class: i === half ? 'mid' : '' }, c))));
+    const cells = [];
+    [['Oberkiefer', 'OK'], ['Unterkiefer', 'UK']].forEach(([name, short], r) => {
+      const tr = h('tr', { class: r === 0 ? 'upper' : 'lower' }, h('th', { class: 'side', title: name }, short));
+      F.row.forEach((val, i) => {
+        let el;
+        if (ctx.level === 1) {
+          el = h('button', { class: 'fcell', 'aria-label': `${name} ${F.cols[i]}` }, '?');
+          el.dataset.v = '';
+          el.onclick = () => { snd.tap(); const v = el.dataset.v === '' ? 1 : (+el.dataset.v + 1) % 4; el.dataset.v = v; el.textContent = v; el.classList.add('set'); upd(); };
+        } else {
+          el = h('input', { class: 'fcell', type: 'text', inputmode: 'numeric', maxlength: '1', autocomplete: 'off', 'aria-label': `${name} ${F.cols[i]}` });
+          el.addEventListener('input', () => { el.value = el.value.replace(/[^0-9]/g, ''); const k = cells.findIndex((c) => c.el === el); if (el.value && cells[k + 1]) cells[k + 1].el.focus(); upd(); });
+        }
+        cells.push({ el, val });
+        tr.append(h('td', { class: i === half ? 'mid' : '' }, el));
+      });
+      table.append(tr);
+    });
+    wrap.append(h('div', { class: 'formulawrap' }, table));
+    let total = null;
+    const tot = h('div', { class: 'row wrap', style: { marginTop: '12px', gap: '8px' } }, h('b', null, 'Summe = '));
+    if (ctx.level === 1) {
+      F.opts.forEach((n) => { const b = h('button', { class: 'word' }, n + ' Zähne'); b.onclick = () => { snd.tap(); total = n; $$sel(tot, b); upd(); }; tot.append(b); });
+    } else {
+      const inp = h('input', { class: 'gap', type: 'text', inputmode: 'numeric', style: { width: '80px' }, 'aria-label': 'Summe' });
+      inp.addEventListener('input', () => { total = parseInt(inp.value, 10); upd(); });
+      tot.append(inp, h('span', null, ' Zähne'));
+    }
+    wrap.append(h('div', { class: 'hint' }, ctx.level === 1 ? 'Tippe auf ein Feld, bis die richtige Zahl dasteht (1, 2, 3, 0 …).' : 'Trag für jedes Feld die Anzahl der Zähne ein.'), tot);
+    const act = actions('Prüfen', () => {
+      act.btn.disabled = true;
+      let right = 0;
+      cells.forEach((c) => { const v = ctx.level === 1 ? c.el.dataset.v : c.el.value; const ok = String(v) === String(c.val); if (ok) right++; c.el.disabled = true; if (!ctx.exam) { c.el.classList.add(ok ? 'ok' : 'bad'); if (!ok) c.el.textContent !== undefined && (ctx.level === 1 ? (c.el.textContent = c.val) : (c.el.value = c.val)); } });
+      const totOk = total === F.total;
+      if (totOk) right++;
+      const max = cells.length + 1;
+      const half2 = F.row.slice(0, F.row.length / 2).reverse().join('-');
+      ctx.done({ score: right / max, ok: right === max, html: `<b>Richtig:</b> pro Viertel ${half2} (von der Mitte aus: ${F.cols.slice(F.cols.length / 2).join('-')}), insgesamt <b>${F.total} Zähne</b>.${q.which === 'milch' ? ' Im Milchgebiss gibt es keine Prämolaren (P).' : ''}`, answer: F.total + ' Zähne' });
+    }, true);
+    wrap.append(act.box);
+    function upd() {
+      const filled = cells.every((c) => (ctx.level === 1 ? c.el.dataset.v !== '' : c.el.value !== ''));
+      act.btn.disabled = !(filled && total != null && !Number.isNaN(total));
+    }
+    function $$sel(box, b) { box.querySelectorAll('.word').forEach((x) => x.classList.toggle('sel', x === b)); }
+  },
+  /* ---------- multiple choice with a picture ---------- */
+  pick(q, ctx, wrap) {
+    wrap.append(title(q.q));
+    if (q.d) {
+      const dg = h('div', { class: 'diagram qpic', html: diagramSVG(q.d, { markers: q.markers !== false, only: q.only, arrow: false }) });
+      if (q.hl) highlight(dg, q.hl);
+      wrap.append(dg);
+    }
+    choice(wrap, shuffle([q.a, ...q.wrong]), (o) => o === q.a, ctx, q, q.a);
+  },
   /* ---------- fact: L1 multiple choice, L2 typing ---------- */
   fact(q, ctx, wrap) {
     wrap.append(title(q.q));

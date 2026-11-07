@@ -109,19 +109,20 @@ function organsArt() {
 const TCX = 300;
 function toothAt(deg) { const r = deg * Math.PI / 180, a = 196, b = 330, top = 92; return [TCX + a * Math.sin(r), top + b * (1 - Math.cos(r)), Math.atan2(b * Math.sin(r), a * Math.cos(r)) * 180 / Math.PI]; }
 const toothL = (deg) => { const [x, y] = toothAt(deg); return [Math.round(2 * TCX - x), Math.round(y)]; };
+function toothShape(k) {
+  if (k === 'I') return `<rect x="-16" y="-11" width="32" height="22" rx="7"/><path d="M-11 -4 h22" stroke-width="1.6" opacity=".5"/>`;
+  if (k === 'C') return `<path d="M0 -17 C14 -10 16 6 8 14 C3 18 -3 18 -8 14 C-16 6 -14 -10 0 -17 Z"/><circle r="2.5" cy="-2" fill="${OUT}" opacity=".35"/>`;
+  if (k === 'P') return `<rect x="-16" y="-17" width="32" height="34" rx="11"/><path d="M-9 0 h18" stroke-width="1.8" opacity=".5"/>`;
+  const sz = k === 'W' ? 19 : 22;
+  return `<rect x="-${sz}" y="-${sz}" width="${sz * 2}" height="${sz * 2}" rx="12"/><path d="M-${sz - 6} 0 h${2 * sz - 12} M0 -${sz - 6} v${2 * sz - 12}" stroke-width="1.8" opacity=".5"/>`;
+}
+
 function teethArt() {
   const cx = TCX, at = toothAt;
   const teeth = [
     ['schneidezaehne', 7, 'I'], ['schneidezaehne', 19, 'I'], ['eckzaehne', 31, 'C'], ['backenzaehne', 43, 'P'], ['backenzaehne', 55, 'P'],
     ['mahlzaehne', 69, 'M'], ['mahlzaehne', 84, 'M'], ['weisheitszaehne', 99, 'W'],
   ];
-  const shape = (k) => {
-    if (k === 'I') return `<rect x="-16" y="-11" width="32" height="22" rx="7"/><path d="M-11 -4 h22" stroke-width="1.6" opacity=".5"/>`;
-    if (k === 'C') return `<path d="M0 -17 C14 -10 16 6 8 14 C3 18 -3 18 -8 14 C-16 6 -14 -10 0 -17 Z"/><circle r="2.5" cy="-2" fill="${OUT}" opacity=".35"/>`;
-    if (k === 'P') return `<rect x="-16" y="-17" width="32" height="34" rx="11"/><path d="M-9 0 h18" stroke-width="1.8" opacity=".5"/>`;
-    const sz = k === 'W' ? 19 : 22;
-    return `<rect x="-${sz}" y="-${sz}" width="${sz * 2}" height="${sz * 2}" rx="12"/><path d="M-${sz - 6} 0 h${2 * sz - 12} M0 -${sz - 6} v${2 * sz - 12}" stroke-width="1.8" opacity=".5"/>`;
-  };
   let s = '';
   // palate and gum ridge
   const arch = []; for (let d = -104; d <= 104; d += 4) { const [x, y] = at(d < 0 ? -d : d); arch.push([d < 0 ? 2 * cx - x : x, y]); }
@@ -137,8 +138,30 @@ function teethArt() {
       const x = side === 1 ? x0 : 2 * cx - x0;
       const rot = side === 1 ? ang : 180 - ang;
       const dash = k === 'W' ? ' stroke-dasharray="5 4"' : '';
-      groups[id] = (groups[id] || '') + `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(rot - 90).toFixed(1)}) scale(1.22)" fill="${C.tooth}" stroke="${OUT}" stroke-width="3"${dash}>${shape(k)}</g>`;
+      groups[id] = (groups[id] || '') + `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(rot - 90).toFixed(1)}) scale(1.22)" fill="${C.tooth}" stroke="${OUT}" stroke-width="3"${dash}>${toothShape(k)}</g>`;
     }
+  }
+  for (const [id, g] of Object.entries(groups)) s += part(id, g);
+  return s;
+}
+
+
+/* Milchgebiss: 5 teeth per side (I, I, C, M, M), smaller arch */
+function milkAt(deg) { const r = deg * Math.PI / 180, a = 150, b = 250, top = 110; return [TCX + a * Math.sin(r), top + b * (1 - Math.cos(r)), Math.atan2(b * Math.sin(r), a * Math.cos(r)) * 180 / Math.PI]; }
+const milkL = (deg) => { const [x, y] = milkAt(deg); return [Math.round(2 * TCX - x), Math.round(y)]; };
+function milkArt() {
+  const teeth = [['schneidezaehne', 9, 'I'], ['schneidezaehne', 25, 'I'], ['eckzaehne', 42, 'C'], ['mahlzaehne', 62, 'M'], ['mahlzaehne', 86, 'M']];
+  let s = '';
+  const arch = []; for (let d = -92; d <= 92; d += 4) { const [x, y] = milkAt(Math.abs(d)); arch.push([d < 0 ? 2 * TCX - x : x, y]); }
+  const path = 'M' + arch.map((p) => p.map((v) => v.toFixed(1)).join(' ')).join(' L');
+  s += `<path d="${path}" fill="none" stroke="${C.gum}" stroke-width="76" stroke-linecap="round" stroke-linejoin="round"/>`;
+  s += `<path d="${path} Z" fill="#ffc8d2"/>`;
+  s += `<path d="M300 150 V400" stroke="${OUT}" stroke-width="2" stroke-dasharray="6 6" opacity=".35"/>`;
+  const groups = {};
+  for (const side of [1, -1]) for (const [id, deg, k] of teeth) {
+    const [x0, y, ang] = milkAt(deg);
+    const x = side === 1 ? x0 : 2 * TCX - x0, rot = side === 1 ? ang : 180 - ang;
+    groups[id] = (groups[id] || '') + `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${(rot - 90).toFixed(1)}) scale(${k === 'M' ? 1.05 : 1.1})" fill="${C.tooth}" stroke="${OUT}" stroke-width="3">${toothShape(k)}</g>`;
   }
   for (const [id, g] of Object.entries(groups)) s += part(id, g);
   return s;
@@ -338,6 +361,15 @@ export const DIAGRAMS = {
       { id: 'backenzaehne', n: 3, name: 'Backenzähne (Prämolaren)', alts: ['Backenzähne', 'Backenzahn', 'Prämolaren', 'vordere Backenzähne', 'Praemolaren'], at: toothL(43), mk: [46, 236], info: 'Kaufläche mit 2 Höckern: zerkleinern und zermahlen (Prämolaren, P).' },
       { id: 'mahlzaehne', n: 4, name: 'Mahlzähne (Molaren)', alts: ['Mahlzähne', 'Mahlzahn', 'Molaren', 'hintere Backenzähne'], at: toothL(69), mk: [40, 350], info: 'Große Kaufläche mit mehreren Höckern: zermahlen (Molaren, M).' },
       { id: 'weisheitszaehne', n: 5, name: 'Weisheitszähne', alts: ['Weisheitszähne', 'Weisheitszahn'], at: toothL(99), mk: [40, 480], info: 'Die dritten Mahlzähne ganz hinten. Brechen oft erst spät oder gar nicht durch.' },
+    ],
+  },
+  milchgebiss: {
+    title: 'Das Milchgebiss (Oberkiefer)', vb: [0, 0, 600, 440], art: milkArt,
+    note: 'Wie auf Seite 3: Die Nummer 3 fehlt, denn Kinder haben noch keine Backenzähne (Prämolaren).',
+    parts: [
+      { id: 'schneidezaehne', n: 1, name: 'Schneidezähne', alts: ['Schneidezähne', 'Schneidezahn', 'Incisivi', 'Milchschneidezähne'], at: milkL(9), mk: [300, 40], info: '2 pro Viertel: abbeißen.' },
+      { id: 'eckzaehne', n: 2, name: 'Eckzähne', alts: ['Eckzähne', 'Eckzahn', 'Canini', 'Milcheckzähne'], at: milkL(42), mk: [70, 150], info: '1 pro Viertel: festhalten, abreißen.' },
+      { id: 'mahlzaehne', n: 4, name: 'Mahlzähne (Milchmolaren)', alts: ['Mahlzähne', 'Mahlzahn', 'Molaren', 'Milchmolaren', 'Milchmahlzähne', 'Backenzähne'], at: milkL(74), mk: [60, 330], info: '2 pro Viertel: zermahlen. Prämolaren gibt es im Milchgebiss nicht.' },
     ],
   },
   magen: {
