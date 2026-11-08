@@ -7,7 +7,7 @@ import { CHAPTERS } from '../js/content.js';
 const KEY = process.env.OPENAI_API_KEY || 'set-by-proxy';
 const VOICE = process.env.TTS_VOICE || 'nova';
 const MODEL = process.env.TTS_MODEL || 'gpt-4o-mini-tts';
-const INSTRUCTIONS = 'Sprich Deutsch (österreichisch gefärbt ist willkommen), freundlich und warm, wie eine junge Tierärztin, die einer 15-Jährigen etwas Spannendes erklärt. Ruhiges, natürliches Tempo, klare Betonung der Fachwörter, kleine Pausen zwischen den Sätzen.';
+const INSTRUCTIONS = 'Sprich Deutsch (österreichisch gefärbt ist willkommen), freundlich und warm, wie eine junge Biologie-Lehrerin, die einer 15-Jährigen etwas Spannendes erklärt. Ruhiges, natürliches Tempo, klare Betonung der Fachwörter, kleine Pausen zwischen den Sätzen.';
 const OUT = new URL('../audio/', import.meta.url);
 fs.mkdirSync(OUT, { recursive: true });
 

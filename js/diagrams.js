@@ -267,7 +267,7 @@ function villusArt() {
 }
 
 /* ------------------------------------------------------------------ */
-/* 8. Vom Nährstoff zum Baustein (Seite 8, Abb. 1 – die Katzen-Stelle)  */
+/* 8. Vom Nährstoff zum Baustein (Seite 8, Abb. 1)  */
 /* ------------------------------------------------------------------ */
 function breakdownArt() {
   const ring = (x, y, col = '#ffcf5c') => `<polygon points="${[0, 60, 120, 180, 240, 300].map((a) => { const r = a * Math.PI / 180; return `${(x + 13 * Math.cos(r)).toFixed(1)},${(y + 13 * Math.sin(r)).toFixed(1)}`; }).join(' ')}" fill="${col}" stroke="${OUT}" stroke-width="2.4"/>`;
@@ -404,7 +404,7 @@ export const DIAGRAMS = {
     note: 'Wie auf Seite 3: 1 vorne bis 5 ganz hinten.',
     parts: [
       { id: 'schneidezaehne', n: 1, name: 'Schneidezähne', alts: ['Schneidezähne', 'Schneidezahn', 'Incisivi', 'Inzisiven'], at: toothL(7), mk: [300, 26], info: 'Abbeißen und Abschneiden (Incisivi, I).' },
-      { id: 'eckzaehne', n: 2, name: 'Eckzähne', alts: ['Eckzähne', 'Eckzahn', 'Canini'], at: toothL(31), mk: [56, 120], info: 'Festhalten und Abreißen. Bei Raubtieren wie Katzen werden sie zu langen Fangzähnen (Canini, C).' },
+      { id: 'eckzaehne', n: 2, name: 'Eckzähne', alts: ['Eckzähne', 'Eckzahn', 'Canini'], at: toothL(31), mk: [56, 120], info: 'Festhalten und Abreißen. Bei Raubtieren (z. B. Hund, Löwe) werden sie zu langen Fangzähnen (Canini, C).' },
       { id: 'backenzaehne', n: 3, name: 'Backenzähne (Prämolaren)', alts: ['Backenzähne', 'Backenzahn', 'Prämolaren', 'vordere Backenzähne', 'Praemolaren'], at: toothL(43), mk: [46, 236], info: 'Kaufläche mit 2 Höckern: zerkleinern und zermahlen (Prämolaren, P).' },
       { id: 'mahlzaehne', n: 4, name: 'Mahlzähne (Molaren)', alts: ['Mahlzähne', 'Mahlzahn', 'Molaren', 'hintere Backenzähne'], at: toothL(69), mk: [40, 350], info: 'Große Kaufläche mit mehreren Höckern: zermahlen (Molaren, M).' },
       { id: 'weisheitszaehne', n: 5, name: 'Weisheitszähne', alts: ['Weisheitszähne', 'Weisheitszahn'], at: toothL(99), mk: [40, 480], info: 'Die dritten Mahlzähne ganz hinten. Brechen oft erst spät oder gar nicht durch.' },

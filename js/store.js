@@ -1,5 +1,6 @@
 /* Progress lives only in this browser (localStorage). Nothing is sent anywhere. */
 import { todayStr } from './util.js';
+import { OLD_IDS } from './brand.js';
 
 const KEY = 'schnurrologie.v1';
 
@@ -10,7 +11,7 @@ const DEFAULT = {
   days: {},            // 'YYYY-MM-DD' -> { answered, correct, xp, minutes }
   items: {},           // itemId -> { box, right, wrong, last }
   chapters: {},        // chapterId -> { learned, video, l1, l2 } best scores 0..1
-  cats: [],            // unlocked collectible cat ids
+  badges: [],          // unlocked collectible badge ids
   plan: {},            // taskId -> true
   probe: [],           // [{date, pct, grade}]
   stats: { answered: 0, correct: 0, bestCombo: 0, typed: 0 },
@@ -23,6 +24,7 @@ function load() {
     const raw = localStorage.getItem(KEY);
     if (!raw) return structuredClone(DEFAULT);
     const s = JSON.parse(raw);
+    if (Array.isArray(s.cats)) { s.badges = [...new Set([...(s.badges || []), ...s.cats.map((id) => OLD_IDS[id] || id)])]; delete s.cats; }
     return { ...structuredClone(DEFAULT), ...s, settings: { ...DEFAULT.settings, ...(s.settings || {}) }, stats: { ...DEFAULT.stats, ...(s.stats || {}) } };
   } catch (e) {
     return structuredClone(DEFAULT);
@@ -42,16 +44,16 @@ export function reset() {
   save();
 }
 
-/* ---------- ranks: the vet career ---------- */
+/* ---------- ranks: from beginner to Bio-Profi ---------- */
 export const RANKS = [
-  { xp: 0, title: 'Schnupper-Praktikantin', icon: '🐾' },
-  { xp: 150, title: 'Praktikantin', icon: '🩹' },
-  { xp: 400, title: 'Tierarzt-Helferin', icon: '🧤' },
-  { xp: 800, title: 'Studentin der Tiermedizin', icon: '📚' },
-  { xp: 1400, title: 'Assistenz-Tierärztin', icon: '🩺' },
-  { xp: 2200, title: 'Tierärztin', icon: '👩‍⚕️' },
-  { xp: 3200, title: 'Fachtierärztin für Katzen', icon: '🐈' },
-  { xp: 4500, title: 'Chefärztin der Katzenklinik', icon: '👑' },
+  { xp: 0, title: 'Einsteigerin', icon: '🌱' },
+  { xp: 150, title: 'Entdeckerin', icon: '🔍' },
+  { xp: 400, title: 'Forscherin', icon: '🔬' },
+  { xp: 800, title: 'Laborprofi', icon: '🧪' },
+  { xp: 1400, title: 'Bio-Expertin', icon: '🧬' },
+  { xp: 2200, title: 'Verdauungs-Profi', icon: '🏅' },
+  { xp: 3200, title: 'Nerven-Meisterin', icon: '🧠' },
+  { xp: 4500, title: 'Bio-Champion', icon: '👑' },
 ];
 export function rankFor(xp = S.xp) {
   let i = 0;
@@ -77,7 +79,7 @@ export function today() {
   return S.days[k];
 }
 
-/* Daily streak ("Pfoten-Serie"): counts consecutive days with at least one answer. */
+/* Daily streak ("Lern-Serie"): counts consecutive days with at least one answer. */
 export function touchStreak() {
   const t = todayStr();
   if (S.streak.last === t) return false;
@@ -121,9 +123,9 @@ export function mastery(ids) {
   return sum / ids.length;
 }
 
-export function unlockCat(id) {
-  if (S.cats.includes(id)) return false;
-  S.cats.push(id);
+export function unlockBadge(id) {
+  if (S.badges.includes(id)) return false;
+  S.badges.push(id);
   save();
   return true;
 }

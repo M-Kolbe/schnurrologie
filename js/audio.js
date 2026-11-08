@@ -1,5 +1,5 @@
-/* Schnurrologie sound: everything is synthesised live with the Web Audio API.
-   No sound files, works offline. Cat sounds (miau, schnurren, mrrp), feedback sounds, and three music tracks. */
+/* BioCoach sound: everything is synthesised live with the Web Audio API.
+   No sound files, works offline. Feedback sounds (chime, success, soft) and three music tracks. */
 import { S, save } from './store.js';
 
 const A = { ctx: null, master: null, sfx: null, music: null, noise: {}, track: null, timer: null };
@@ -57,65 +57,6 @@ const N = (m) => 440 * Math.pow(2, (m - 69) / 12); // midi -> Hz
 
 function canPlay() { return S.settings.sound && ensure(); }
 
-/* ---------- cat sounds ---------- */
-export function meow({ pitch = 1, len = 0.62, vol = 0.32, when = 0, up = false } = {}) {
-  if (!canPlay()) return;
-  const ctx = A.ctx, t = ctx.currentTime + when, f0 = 560 * pitch;
-  const osc = ctx.createOscillator(); osc.type = 'sawtooth';
-  osc.frequency.setValueAtTime(f0 * 0.8, t);
-  if (up) {
-    osc.frequency.linearRampToValueAtTime(f0 * 1.0, t + len * 0.5);
-    osc.frequency.linearRampToValueAtTime(f0 * 1.45, t + len);
-  } else {
-    osc.frequency.linearRampToValueAtTime(f0 * 1.3, t + len * 0.38);
-    osc.frequency.linearRampToValueAtTime(f0 * 0.72, t + len);
-  }
-  const vib = ctx.createOscillator(), vg = gainNode(f0 * 0.018);
-  vib.frequency.value = 7; vib.connect(vg); vg.connect(osc.frequency);
-  const lp = filt('lowpass', 500, 0.7);
-  lp.frequency.setValueAtTime(450, t);
-  lp.frequency.exponentialRampToValueAtTime(5200, t + len * 0.22);
-  lp.frequency.exponentialRampToValueAtTime(1800, t + len);
-  const f1 = filt('bandpass', 800, 3.5), f2 = filt('bandpass', 2000, 5);
-  f1.frequency.setValueAtTime(650, t); f1.frequency.linearRampToValueAtTime(1350, t + len * 0.38); f1.frequency.linearRampToValueAtTime(800, t + len);
-  f2.frequency.setValueAtTime(1700, t); f2.frequency.linearRampToValueAtTime(2700, t + len * 0.38); f2.frequency.linearRampToValueAtTime(1400, t + len);
-  const g1 = gainNode(1), g2 = gainNode(0.55), env = gainNode(0);
-  env.gain.setValueAtTime(0, t);
-  env.gain.linearRampToValueAtTime(vol, t + 0.06);
-  env.gain.setValueAtTime(vol, t + len * 0.6);
-  env.gain.exponentialRampToValueAtTime(0.0008, t + len);
-  osc.connect(lp); lp.connect(f1); lp.connect(f2); f1.connect(g1); f2.connect(g2); g1.connect(env); g2.connect(env); env.connect(A.sfx);
-  // a little breath
-  const br = noiseSrc('white'), bf = filt('bandpass', 3000, 0.8), bg = gainNode(0);
-  bg.gain.setValueAtTime(0, t); bg.gain.linearRampToValueAtTime(vol * 0.05, t + 0.05); bg.gain.exponentialRampToValueAtTime(0.0001, t + len);
-  br.connect(bf); bf.connect(bg); bg.connect(A.sfx);
-  osc.start(t); vib.start(t); br.start(t);
-  osc.stop(t + len + 0.05); vib.stop(t + len + 0.05); br.stop(t + len + 0.05);
-}
-
-export function mrrp(when = 0) { meow({ pitch: 1.15, len: 0.28, vol: 0.22, up: true, when }); }
-
-export function purr(dur = 1.8, vol = 0.5) {
-  if (!canPlay()) return;
-  const ctx = A.ctx, t = ctx.currentTime;
-  const src = noiseSrc('brown'), lp = filt('lowpass', 380, 0.9), am = gainNode(0), env = gainNode(0);
-  const lfo = ctx.createOscillator(); lfo.type = 'triangle'; lfo.frequency.value = 26;
-  const depth = gainNode(0.5); lfo.connect(depth); depth.connect(am.gain); am.gain.value = 0.5;
-  const hum = ctx.createOscillator(); hum.type = 'sine'; hum.frequency.value = 52; const hg = gainNode(0.25);
-  src.connect(lp); lp.connect(am); hum.connect(hg); hg.connect(am); am.connect(env); env.connect(A.sfx);
-  const breaths = Math.max(1, Math.round(dur / 0.9));
-  const step = dur / breaths;
-  env.gain.setValueAtTime(0, t);
-  for (let i = 0; i < breaths; i++) {
-    const b = t + i * step;
-    env.gain.linearRampToValueAtTime(vol * (i % 2 ? 0.7 : 1), b + step * 0.35);
-    env.gain.linearRampToValueAtTime(vol * 0.15, b + step * 0.95);
-  }
-  env.gain.linearRampToValueAtTime(0, t + dur + 0.1);
-  src.start(t); lfo.start(t); hum.start(t);
-  src.stop(t + dur + 0.2); lfo.stop(t + dur + 0.2); hum.stop(t + dur + 0.2);
-}
-
 /* ---------- feedback sounds ---------- */
 function bell(freq, t, dur = 0.6, vol = 0.18, type = 'sine') {
   const ctx = A.ctx, o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = gainNode(0);
@@ -126,13 +67,37 @@ function bell(freq, t, dur = 0.6, vol = 0.18, type = 'sine') {
   o.start(t); o2.start(t); o.stop(t + dur + 0.05); o2.stop(t + dur + 0.05);
 }
 
+/* Two soft bells: a friendly "ding-dong" (sound switched on, start, small successes). */
+export function chime({ pitch = 1, when = 0 } = {}) {
+  if (!canPlay()) return;
+  const t = A.ctx.currentTime + when, m = 79 + Math.round(12 * Math.log2(pitch));
+  bell(N(m), t, 0.55, 0.14);
+  bell(N(m + 5), t + 0.13, 0.8, 0.12);
+}
+
+/* Rising, warm arpeggio: good results, many right answers in a row. */
+export function success(dur = 1.4, vol = 0.4) {
+  if (!canPlay()) return;
+  const t = A.ctx.currentTime, k = Math.max(0.2, Math.min(1, vol / 0.45));
+  [72, 76, 79, 84].forEach((m, i) => bell(N(m), t + i * 0.08, Math.max(0.5, dur * 0.6), 0.11 * k, 'triangle'));
+  bell(N(88), t + 0.36, Math.max(0.8, dur), 0.08 * k);
+}
+
+/* Low, gentle "hm" (time warning, not quite right). */
+export function soft(when = 0) {
+  if (!canPlay()) return;
+  const t = A.ctx.currentTime + when;
+  bell(N(67), t, 0.35, 0.09, 'triangle');
+  bell(N(64), t + 0.12, 0.45, 0.08, 'triangle');
+}
+
 export function correct(combo = 0) {
   if (!canPlay()) return;
   const t = A.ctx.currentTime, k = Math.min(combo, 8);
   const base = 76 + [0, 2, 4, 5, 7, 9, 11, 12, 14][k];
   bell(N(base), t, 0.45, 0.16);
   bell(N(base + 7), t + 0.09, 0.6, 0.15);
-  if (combo >= 2 && combo % 3 === 2) meow({ pitch: 1.1 + Math.random() * 0.2, len: 0.5, vol: 0.28, when: 0.18 });
+  if (combo >= 2 && combo % 3 === 2) bell(N(base + 12), t + 0.2, 0.7, 0.1);
 }
 
 export function wrong() {
@@ -142,7 +107,6 @@ export function wrong() {
   o.frequency.setValueAtTime(330, t); o.frequency.exponentialRampToValueAtTime(196, t + 0.28);
   g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.22, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0005, t + 0.35);
   o.connect(lp); lp.connect(g); g.connect(A.sfx); o.start(t); o.stop(t + 0.4);
-  mrrp(0.32);
 }
 
 export function tap() {
@@ -156,7 +120,7 @@ export function fanfare() {
   const t = A.ctx.currentTime;
   [72, 76, 79, 84, 88].forEach((m, i) => bell(N(m), t + i * 0.09, 0.7, 0.14, 'triangle'));
   bell(N(91), t + 0.5, 1.2, 0.12);
-  meow({ pitch: 1.2, len: 0.7, vol: 0.3, when: 0.75 });
+  [84, 88, 91].forEach((m) => bell(N(m), t + 0.75, 1.4, 0.07));
 }
 
 export function whoosh() {
@@ -169,9 +133,9 @@ export function whoosh() {
 
 /* ---------- music ---------- */
 export const TRACKS = {
-  lofi: { name: 'Schnurr-Lofi (ruhig lernen)', bpm: 76 },
-  happy: { name: 'Pfoten-Galopp (fröhlich)', bpm: 108 },
-  focus: { name: 'Stille Praxis (Konzentration)', bpm: 60 },
+  lofi: { name: 'Lofi (ruhig lernen)', bpm: 76 },
+  happy: { name: 'Sonnenschein (fröhlich)', bpm: 108 },
+  focus: { name: 'Fokus (Konzentration)', bpm: 60 },
 };
 
 function epiano(freq, t, dur, vol) {

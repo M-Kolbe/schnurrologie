@@ -154,7 +154,7 @@ Diese Datei zeigt, wo jeder Teil der 11 Heftseiten in der App vorkommt. In der A
 - [x] Mikrovilli bilden den Bürstensaum
 - [x] Blut → Pfortader → Leber
 - [x] Lymphe → obere Hohlvene → Blut (Fette)
-- [x] Abbildung 1: Vorgänge bei der Verdauung (die Katzen-Stelle), mit Erklärung wie man sie liest
+- [x] Abbildung 1: Vorgänge bei der Verdauung, mit Erklärung wie man sie liest
 - [x] Aufgabe a: Abbildung 2 beschriften (a Darmzotten, b Mikrovilli, c Blutgefäße, d Lymphgefäß)
 
 **Aufgaben in der App (Heft-Modus):**

@@ -449,7 +449,7 @@ function typeBox(wrap, answers, ctx, q) {
     hintUsed++;
     const a = answers[0];
     const show = a.split(' ').map((w) => w.slice(0, Math.min(hintUsed, w.length)) + w.slice(Math.min(hintUsed, w.length)).replace(/[^\s]/g, '·')).join(' ');
-    hint.textContent = 'Tipp: ' + show + (hintUsed === 1 ? '  (Tipps kosten ein paar Leckerli)' : '');
+    hint.textContent = 'Tipp: ' + show + (hintUsed === 1 ? '  (Tipps kosten ein paar Punkte)' : '');
     inp.focus();
   };
   const go = () => {

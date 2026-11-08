@@ -1,9 +1,9 @@
-/* Schnurrologie – screens and navigation. */
+/* BioCoach – screens and navigation. */
 import { $, $$, h, frag, shuffle, pick, esc, daysUntil, todayStr, clamp } from './util.js';
-import { S, save, reset, addXP, rankFor, RANKS, record, item, chapterState, mastery, unlockCat } from './store.js';
+import { S, save, reset, addXP, rankFor, RANKS, record, item, chapterState, mastery, unlockBadge } from './store.js';
 import { CHAPTERS, CARDS, PLAN, ALL_QUESTIONS, WORKSHEETS, chapterById } from './content.js';
 import { DIAGRAMS, diagramSVG, numbering, highlight, partById, zoomTo } from './diagrams.js';
-import { docSVG, CATS, catById, catPic } from './cats.js';
+import { APP_NAME, logoSVG, emblem, chapterArt, BADGES, badgeById, badgeSVG } from './brand.js';
 import { renderQuestion, pickSession, usableAt, itemKey } from './engine.js';
 import { icon as I, CH_ICON } from './icons.js';
 import * as snd from './audio.js';
@@ -32,7 +32,7 @@ function confetti(n = 60) {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const c = $('#fx'), ctx = c.getContext('2d');
   const W = c.width = innerWidth * devicePixelRatio, H = c.height = innerHeight * devicePixelRatio;
-  const em = ['🐾', '🐟', '⭐', '💜', '🧶'];
+  const em = ['⭐', '✨', '🎉', '💚', '💜', '🧬'];
   const P = Array.from({ length: n }, () => ({ x: Math.random() * W, y: -Math.random() * H * 0.5, vy: (2 + Math.random() * 4) * devicePixelRatio, vx: (Math.random() - 0.5) * 3 * devicePixelRatio, r: Math.random() * 6, vr: (Math.random() - 0.5) * 0.2, e: pick(em), s: (18 + Math.random() * 16) * devicePixelRatio }));
   const t0 = performance.now();
   const step = (t) => {
@@ -65,12 +65,13 @@ function chapterMastery(id) {
   return mastery(keys);
 }
 function levelMastery(ch, n) { const qs = ch.q.filter((q) => usableAt(q, n)); return qs.length ? mastery(qs.map((q) => itemKey(q, n))) : 0; }
-function patientMood(m) {
-  if (m >= 0.8) return { mood: 'happy', acc: ['heart'], label: 'geheilt' };
-  if (m >= 0.35) return { mood: 'happy', acc: ['bandage'], label: 'wird gesund' };
-  return { mood: 'sick', acc: ['cone', 'thermo'], label: 'krank' };
+function chapterStatus(m) {
+  if (m >= 0.8) return 'gemeistert';
+  if (m >= 0.35) return 'gut dabei';
+  if (m > 0) return 'begonnen';
+  return 'neu';
 }
-function patientSVG(ch) { const pm = patientMood(chapterMastery(ch.id)); return catPic(catById(ch.cat), pm.mood, pm.acc); }
+function chapterPic(ch) { return chapterArt(CH_ICON[ch.id], ch.color, chapterMastery(ch.id)); }
 const examDays = () => daysUntil(S.settings.examDate);
 const nav = (hash) => { location.hash = hash; };
 const focusMode = (on) => document.body.classList.toggle('focus', on);
@@ -78,34 +79,35 @@ function topbar() {
   const top = $('#top .inner');
   top.innerHTML = '';
   top.append(
-    h('a', { class: 'brand', href: '#/', html: docSVG('happy') + '<span>Schnurrologie</span>' }),
+    h('a', { class: 'brand', href: '#/', html: logoSVG() + `<span>${APP_NAME}</span>` }),
     h('div', { class: 'spacer' }),
-    h('a', { class: 'pill fish', href: '#/katzen', title: 'Leckerli (deine Punkte)' }, ico('fish'), String(S.xp)),
-    h('a', { class: 'pill paw', href: '#/plan', title: 'Tage in Folge gelernt' }, ico('paw'), String(S.streak.count || 0)),
+    h('a', { class: 'pill xp', href: '#/erfolge', title: 'Deine Punkte' }, ico('star'), String(S.xp)),
+    h('a', { class: 'pill streak', href: '#/plan', title: 'Tage in Folge gelernt' }, ico('flame'), String(S.streak.count || 0)),
     h('button', { class: 'iconbtn', 'aria-pressed': String(!!S.settings.music), title: 'Musik an/aus', onclick: (e) => { snd.ensure(); snd.setMusic(!S.settings.music); e.currentTarget.setAttribute('aria-pressed', String(S.settings.music)); } }, ico('music')),
-    h('button', { class: 'iconbtn', 'aria-pressed': String(!!S.settings.sound), title: 'Töne an/aus', onclick: (e) => { S.settings.sound = !S.settings.sound; save(); e.currentTarget.setAttribute('aria-pressed', String(S.settings.sound)); if (S.settings.sound) snd.meow(); } }, ico('sound')),
+    h('button', { class: 'iconbtn', 'aria-pressed': String(!!S.settings.sound), title: 'Töne an/aus', onclick: (e) => { S.settings.sound = !S.settings.sound; save(); e.currentTarget.setAttribute('aria-pressed', String(S.settings.sound)); if (S.settings.sound) snd.chime(); } }, ico('sound')),
     h('a', { class: 'iconbtn', href: '#/einstellungen', title: 'Einstellungen' }, ico('gear')),
   );
 }
 function tabs(active) { $$('#tabs a').forEach((a) => a.classList.toggle('on', a.dataset.tab === active)); }
 function checkUnlocks() {
   const got = [];
-  for (const ch of CHAPTERS) if (chapterMastery(ch.id) >= 0.8 && unlockCat(ch.cat)) got.push(ch.cat);
-  if (S.streak.count >= 3 && unlockCat('sternchen')) got.push('sternchen');
-  if (S.stats.correct >= 100 && unlockCat('brownie')) got.push('brownie');
-  if (S.stats.bestCombo >= 10 && unlockCat('blitz')) got.push('blitz');
-  if (S.stats.typedRound && unlockCat('mausi')) got.push('mausi');
-  if (CHAPTERS.every((c) => chapterState(c.id).learned) && unlockCat('nachtfee')) got.push('nachtfee');
-  if (S.probe.some((p) => p.grade === 1) && unlockCat('cleo')) got.push('cleo');
+  for (const ch of CHAPTERS) if (chapterMastery(ch.id) >= 0.8 && unlockBadge(ch.id)) got.push(ch.id);
+  if (S.streak.count >= 3 && unlockBadge('serie')) got.push('serie');
+  if (S.stats.correct >= 100 && unlockBadge('hundert')) got.push('hundert');
+  if (S.stats.bestCombo >= 10 && unlockBadge('blitz')) got.push('blitz');
+  if (S.stats.typedRound && unlockBadge('tippen')) got.push('tippen');
+  if (CHAPTERS.every((c) => chapterState(c.id).learned) && unlockBadge('nachteule')) got.push('nachteule');
+  if (S.probe.some((p) => p.grade === 1) && unlockBadge('einser')) got.push('einser');
   got.forEach((id, i) => setTimeout(() => {
-    const c = catById(id);
+    const b = badgeById(id);
+    if (!b) return;
     snd.fanfare(); confetti();
-    toast(`<b>${esc(c.name)}</b> ${c.bonus ? 'ist zu dir gezogen' : 'ist wieder gesund'}!<br><span class="small">Neu in deiner Katzen-Sammlung</span>`, catPic(c, 'happy', ['heart']));
+    toast(`Abzeichen <b>${esc(b.name)}</b> freigeschaltet!<br><span class="small">${b.bonus ? esc(b.bonus) : 'Kapitel gemeistert'} · jetzt in deinen Erfolgen</span>`, badgeSVG(b));
   }, 600 + i * 1800));
 }
 function gainXP(n) {
   const up = addXP(n);
-  if (up) setTimeout(() => { snd.fanfare(); confetti(80); toast(`Befördert! Du bist jetzt <b>${esc(up.title)}</b>`, docSVG('wow')); }, 400);
+  if (up) setTimeout(() => { snd.fanfare(); confetti(80); toast(`Neuer Rang! Du bist jetzt <b>${esc(up.title)}</b>`, emblem('rank')); }, 400);
 }
 function sheetProgress(w) {
   const qs = w.tasks.map((t) => QBYID[t.ref]).filter(Boolean);
@@ -178,7 +180,7 @@ const routes = [
   [/^#\/probe\/los$/, probeRun],
   [/^#\/bild\/([\w-]+)$/, explore],
   [/^#\/themen$/, topics],
-  [/^#\/katzen$/, catsPage],
+  [/^#\/erfolge$/, badgesPage],
   [/^#\/plan$/, planPage],
   [/^#\/einstellungen$/, settingsPage],
 ];
@@ -201,24 +203,24 @@ addEventListener('hashchange', route);
 let introTimer = null;
 function home() {
   tabs('start');
-  const d = examDays(), r = rankFor(), name = S.name || 'Tierärztin';
+  const d = examDays(), r = rankFor(), name = S.name ? ' ' + S.name : '';
   const hello = pick([
-    `Hallo ${name}! Bereit für die Visite?`,
-    `Miau, ${name}! Heute machen wir ein paar Patienten gesund.`,
-    `Schön, dass du da bist, ${name}. Jede Runde macht dich sicherer.`,
-    `${name}, Tierärztinnen-Wissen: ${pick(CATS).fact}`,
+    `Hallo${name}! Bereit für eine Runde Bio?`,
+    `Hallo${name}! Heute machst du ein paar Kapitel sicher.`,
+    `Schön, dass du da bist${name}. Jede Runde macht dich sicherer.`,
+    `Wusstest du?${name ? ' ' + name + ',' : ''} ${pick(BADGES).fact}`,
   ]);
   const s = h('div', { class: 'screen' });
-  s.append(h('div', { class: 'hero' }, h('div', { class: 'cat', html: docSVG(d <= 0 ? 'wow' : 'happy', ['mirror']) }), h('div', { class: 'bubble' }, hello)));
+  s.append(h('div', { class: 'hero' }, h('div', { class: 'art', html: emblem(d <= 0 ? 'wow' : 'happy') }), h('div', { class: 'bubble' }, hello)));
   s.append(h('div', { class: 'kpis' },
     h('a', { class: 'kpi', href: '#/plan' },
       h('div', { class: 'num' }, d > 0 ? String(d) : d === 0 ? 'Heute' : '✓'),
       h('div', { class: 'lbl' }, d > 1 ? 'Tage bis zum Bio-Test' : d === 1 ? 'Tag – morgen ist der Test' : d === 0 ? 'ist der Bio-Test. Viel Glück!' : 'Test geschafft'),
       h('div', { class: 'sub' }, 'Freitag, 13. November')),
-    h('a', { class: 'kpi', href: '#/katzen' },
-      h('div', { class: 'rk' }, ico('steth'), h('div', { class: 'lbl', style: { marginTop: 0 } }, r.cur.title)),
+    h('a', { class: 'kpi', href: '#/erfolge' },
+      h('div', { class: 'rk' }, ico('medal'), h('div', { class: 'lbl', style: { marginTop: 0 } }, r.cur.title)),
       h('div', { class: 'bar accent' }, h('i', { style: { width: Math.round(r.pct * 100) + '%' } })),
-      h('div', { class: 'sub' }, r.next ? `${S.xp} / ${r.next.xp} Leckerli` : 'Höchster Rang erreicht'))));
+      h('div', { class: 'sub' }, r.next ? `${S.xp} / ${r.next.xp} Punkte` : 'Höchster Rang erreicht'))));
   const dayPlan = PLAN.find((p) => p.date === todayStr());
   if (dayPlan) {
     const open = dayPlan.tasks.filter((t) => !S.plan[t.id]).slice(0, 3);
@@ -234,23 +236,23 @@ function home() {
   s.append(h('a', { class: 'card linkcard', href: '#/stoff' }, h('div', { class: 'ic', html: I('clipboard') }),
     h('div', null, h('b', null, 'Prüfstoff Seite für Seite'), h('span', { class: 'small muted' }, `Alle Aufgaben aus deinem Heft · ${done} von ${WORKSHEETS.length} Seiten sicher`)), h('span', { class: 'go', html: I('chevR') })));
   s.append(h('a', { class: 'card linkcard', href: '#/show' }, h('div', { class: 'ic', style: { background: 'var(--sun-soft)', color: 'var(--sun)' }, html: I('trophy') }),
-    h('div', null, h('b', null, 'Wer wird Tierärztin?'), h('span', { class: 'small muted' }, `Die Quizshow · 15 Stufen · dein Rekord: ${S.showBest || 0}`)), h('span', { class: 'go', html: I('chevR') })));
-  s.append(h('div', { class: 'section-title' }, ico('cat'), 'Deine Patienten'), h('p', { class: 'small muted', style: { margin: '-6px 2px 10px' } }, 'Jedes Kapitel ist eine Katze. Bei 80 % ist sie gesund und kommt in deine Sammlung.'));
-  s.append(patientGrid());
+    h('div', null, h('b', null, 'Wer wird Bio-Profi?'), h('span', { class: 'small muted' }, `Die Quizshow · 15 Stufen · dein Rekord: ${S.showBest || 0}`)), h('span', { class: 'go', html: I('chevR') })));
+  s.append(h('div', { class: 'section-title' }, ico('book'), 'Deine Kapitel'), h('p', { class: 'small muted', style: { margin: '-6px 2px 10px' } }, 'Der Ring zeigt, wie sicher du ein Kapitel kannst. Ab 80 % ist es gemeistert und du bekommst sein Abzeichen.'));
+  s.append(chapterGrid());
   s.append(h('p', { class: 'small muted center', style: { marginTop: '18px' } }, 'Am iPhone: in Safari auf „Teilen“, dann „Zum Home-Bildschirm“.'));
   app.append(s);
   clearTimeout(introTimer);
   if (!S.seenIntro) introTimer = setTimeout(intro, 300);
 }
 
-function patientGrid() {
-  const g = h('div', { class: 'patients' });
+function chapterGrid() {
+  const g = h('div', { class: 'chapgrid' });
   CHAPTERS.forEach((ch, i) => {
-    const m = chapterMastery(ch.id), cat = catById(ch.cat);
-    g.append(h('a', { class: 'patient', href: '#/k/' + ch.id, style: { '--c': ch.color } },
-      h('div', { class: 'pic', html: patientSVG(ch) }, h('span', { class: 'num' }, String(i + 1)), h('span', { class: 'chi', html: I(CH_ICON[ch.id]) })),
+    const m = chapterMastery(ch.id);
+    g.append(h('a', { class: 'chapcard', href: '#/k/' + ch.id, style: { '--c': ch.color } },
+      h('div', { class: 'pic', html: chapterPic(ch) }, h('span', { class: 'num' }, String(i + 1))),
       h('b', null, ch.short),
-      h('div', { class: 'who' }, `${cat.name} · ${patientMood(m).label} · ${Math.round(m * 100)} %`),
+      h('div', { class: 'who' }, `${ch.page} · ${chapterStatus(m)} · ${Math.round(m * 100)} %`),
       h('div', { class: 'bar' }, h('i', { style: { width: Math.round(m * 100) + '%' } }))));
   });
   return g;
@@ -260,12 +262,12 @@ function intro() {
   if ($('.modal') || S.seenIntro || location.hash.length > 2) return;
   const inp = h('input', { type: 'text', id: 'intro-name', placeholder: 'Dein Vorname', value: S.name || '', autocapitalize: 'words' });
   const close = modal(h('div', { class: 'stack center' },
-    h('div', { style: { width: '140px', margin: '0 auto' }, html: docSVG('happy', ['mirror']) }),
-    h('h2', null, 'Willkommen in der Katzenklinik'),
-    h('p', null, 'Ich bin Dr. Schnurrhaar. Unsere Patienten sind krank, und du machst sie gesund, indem du Bio lernst.'),
-    h('p', { class: 'small muted' }, 'Jedes Kapitel ist eine Katze: mit Steckbrief-Karten, Erklär-Film, Stufe 1 (antippen) und Stufe 2 (eintippen). Dazu alle Aufgaben aus deinem Heft und eine Probearbeit.'),
+    h('div', { style: { width: '96px', margin: '0 auto' }, html: logoSVG() }),
+    h('h2', null, `Willkommen bei ${APP_NAME}`),
+    h('p', null, 'Hier lernst du alles für deinen Bio-Test: Verdauung, Enzyme und die Nervenzelle.'),
+    h('p', { class: 'small muted' }, 'Jedes Kapitel hat Steckbrief-Karten, einen Erklär-Film, Stufe 1 (antippen) und Stufe 2 (eintippen). Dazu alle Aufgaben aus deinem Heft, Tests und eine Probearbeit.'),
     h('div', { class: 'field', style: { textAlign: 'left' } }, h('label', { for: 'intro-name' }, 'Wie heißt du?'), inp),
-    h('button', { class: 'btn block', onclick: () => { S.name = inp.value.trim(); S.seenIntro = true; save(); snd.ensure(); snd.meow(); snd.purr(1.4, 0.35); close(); route(); } }, 'Los geht’s'),
+    h('button', { class: 'btn block', onclick: () => { S.name = inp.value.trim(); S.seenIntro = true; save(); snd.ensure(); snd.success(); close(); route(); } }, 'Los geht’s'),
   ), () => { S.seenIntro = true; save(); });
 }
 
@@ -273,7 +275,7 @@ function intro() {
 function topics() {
   tabs('lernen');
   const s = h('div', { class: 'screen' });
-  s.append(h('h1', null, 'Kapitel'), h('p', { class: 'muted' }, 'Deine 11 Seiten in 10 Kapiteln. Jede Katze wird gesund, wenn du ihr Kapitel kannst.'));
+  s.append(h('h1', null, 'Kapitel'), h('p', { class: 'muted' }, 'Deine 11 Seiten in 10 Kapiteln. Ab 80 % ist ein Kapitel gemeistert.'));
   s.append(h('a', { class: 'card linkcard', href: '#/stoff' }, h('div', { class: 'ic', html: I('clipboard') }), h('div', null, h('b', null, 'Prüfstoff Seite für Seite'), h('span', { class: 'small muted' }, 'Alle Aufgaben aus dem Heft')), h('span', { class: 'go', html: I('chevR') })));
   s.append(h('a', { class: 'card linkcard', href: '#/videos' }, h('div', { class: 'ic', style: { background: '#fde3e3', color: '#e62d2d' }, html: I('play') }), h('div', null, h('b', null, 'Alle Erklärvideos'), h('span', { class: 'small muted' }, 'YouTube und Co., nach Kapitel sortiert')), h('span', { class: 'go', html: I('chevR') })));
   s.append(h('a', { class: 'card linkcard', href: '#/glossar', style: { marginBottom: '14px' } }, h('div', { class: 'ic', style: { background: 'var(--lav-soft)', color: 'var(--lav)' }, html: I('book') }), h('div', null, h('b', null, 'Glossar A–Z'), h('span', { class: 'small muted' }, `${GLOSSARY.length} Fachbegriffe, mit Karteikarten`)), h('span', { class: 'go', html: I('chevR') })));
@@ -297,14 +299,14 @@ function chapter(id) {
   const ch = chapterById(id);
   if (!ch) return nav('#/');
   tabs('lernen');
-  const st = chapterState(id), m = chapterMastery(id), cat = catById(ch.cat);
+  const st = chapterState(id), m = chapterMastery(id);
   const idx = CHAPTERS.indexOf(ch);
   const s = h('div', { class: 'screen', style: { '--c': ch.color } });
   s.append(back('#/themen', 'Kapitel'));
-  s.append(h('div', { class: 'chap-head' }, h('div', { class: 'pic', html: patientSVG(ch) }),
+  s.append(h('div', { class: 'chap-head' }, h('div', { class: 'pic', html: chapterPic(ch) }),
     h('div', null, h('div', { class: 'eyebrow' }, `Kapitel ${idx + 1} · ${ch.page}`), h('h1', { style: { fontSize: '1.45rem', margin: '2px 0 6px' } }, ch.title),
       h('div', { class: 'bar' }, h('i', { style: { width: Math.round(m * 100) + '%', background: ch.color } })),
-      h('div', { class: 'small muted', style: { marginTop: '4px' } }, `${cat.name}: ${patientMood(m).label} · ${Math.round(m * 100)} %`))));
+      h('div', { class: 'small muted', style: { marginTop: '4px' } }, `${chapterStatus(m)} · ${Math.round(m * 100)} % sicher`))));
   s.append(h('div', { class: 'bubble', style: { margin: '14px 0 4px 8px' } }, ch.story));
   const modes = h('div', { class: 'modes', style: { marginTop: '16px' } });
   const mode = (ic, t, sub, href, pct) => h('a', { class: 'mode', href }, h('div', { class: 'ic', html: I(ic) }), h('div', null, h('b', null, t), h('span', { class: 'sub' }, sub)), pct != null ? h('span', { class: 'pct' }, pct + ' %') : h('span', { class: 'go', html: I('chevR') }));
@@ -379,7 +381,7 @@ function cards(id) {
 }
 
 /* ---------- Lernkarte ---------- */
-const BOX_ICON = { merk: 'bulb', fix: 'alert', tip: 'info', vet: 'paw' };
+const BOX_ICON = { merk: 'bulb', fix: 'alert', tip: 'info' };
 function learn(id) {
   const ch = chapterById(id);
   tabs('lernen');
@@ -508,8 +510,11 @@ function film(id) {
       const names = (sc.hl || []).map((pid) => DIAGRAMS[sc.d].parts.find((p) => p.id === pid)?.name).filter(Boolean);
       if (names.length) stage.append(h('div', { class: 'focuschip' }, ico('target'), 'Im Fokus: ' + names.join(' · ')));
     }
-    else if (sc.big) inner = h('div', { class: 'scene' }, h('div', { class: 'bigtext' }, h('div', { class: 'bt', html: esc(sc.big).replace(/\n/g, '<br>') }), h('div', { class: 'mini', html: docSVG('happy') })));
-    else { const c = sc.cat === 'doc' ? docSVG('happy', ['mirror']) : sc.cat === 'sick' ? catPic(catById(ch.cat), 'sick', ['thermo']) : catPic(catById(sc.cat) || catById(ch.cat), 'happy'); inner = h('div', { class: 'scene', html: `<div style="width:60%;max-width:280px">${c}</div>` }); }
+    else if (sc.big) inner = h('div', { class: 'scene' }, h('div', { class: 'bigtext' }, h('div', { class: 'bt', html: esc(sc.big).replace(/\n/g, '<br>') }), h('div', { class: 'mini', html: chapterArt(CH_ICON[ch.id], ch.color, 0, true) })));
+    else {
+      const art = sc.intro === 'alert' ? emblem('alert') : chapterArt(CH_ICON[ch.id], ch.color, 0, true);
+      inner = h('div', { class: 'scene' }, h('div', { class: 'titlecard' }, h('div', { class: 'tc-art', html: art }), h('div', { class: 'tc-eyebrow' }, `Kapitel ${CHAPTERS.indexOf(ch) + 1} · ${ch.page}`), h('div', { class: 'tc-title' }, sc.intro === 'alert' ? 'Achtung' : ch.title)));
+    }
     stage.append(inner);
     if (sc.d) {
       const svg = inner.querySelector('svg');
@@ -537,9 +542,9 @@ function film(id) {
   function finish() {
     playing = false; finished = true; setPlay('refresh', 'Nochmal'); snd.duck(false);
     const st = chapterState(id);
-    if (!st.video) { st.video = true; save(); gainXP(15); toast('Film geschaut: +15 Leckerli', docSVG('happy')); }
+    if (!st.video) { st.video = true; save(); gainXP(15); toast('Film geschaut: +15 Punkte', emblem('film')); }
     stage.append(h('div', { class: 'scene', style: { background: 'color-mix(in srgb, var(--bg2) 94%, transparent)' } },
-      h('div', { class: 'center stack' }, h('div', { style: { width: '110px', margin: '0 auto' }, html: docSVG('wink') }), h('b', null, 'Fertig! Jetzt bist du dran:'), h('a', { class: 'btn', href: `#/ueben/${id}/1` }, ico('star'), 'Stufe 1 üben'))));
+      h('div', { class: 'center stack' }, h('div', { style: { width: '110px', margin: '0 auto' }, html: emblem('good') }), h('b', null, 'Fertig! Jetzt bist du dran:'), h('a', { class: 'btn', href: `#/ueben/${id}/1` }, ico('star'), 'Stufe 1 üben'))));
   }
   playBtn.onclick = () => {
     snd.ensure();
@@ -566,20 +571,20 @@ function mixIntro() {
   tabs('ueben');
   const s = h('div', { class: 'screen' });
   s.append(h('div', { class: 'card intro' },
-    h('div', { class: 'cat', html: docSVG('happy', ['stetho']) }),
+    h('div', { class: 'art', html: emblem('flame') }),
     h('h1', null, 'Schnell-Runde'),
     h('p', { class: 'muted' }, 'Zehn gemischte Fragen aus allen Kapiteln. Das ist die wirksamste Art zu üben.'),
     h('ul', null,
       h('li', null, ico('target'), h('span', null, 'Fragen, die du noch nicht sicher kannst, kommen zuerst.')),
       h('li', null, ico('pen'), h('span', null, 'Kapitel, die du in Stufe 1 schon gut kannst, kommen zum Eintippen.')),
       h('li', null, ico('refresh'), h('span', null, 'Falsche Antworten kommen in derselben Runde nochmal.')),
-      h('li', null, ico('flame'), h('span', null, 'Ab 3 richtigen in Folge gibt es Bonus-Leckerli.'))),
+      h('li', null, ico('flame'), h('span', null, 'Ab 3 richtigen in Folge gibt es Bonus-Punkte.'))),
     h('a', { class: 'btn block', href: '#/mix/los' }, ico('bolt'), 'Runde starten')));
   s.append(h('div', { class: 'section-title' }, ico('trophy'), 'Das große Bio-Quiz'));
   s.append(h('a', { class: 'card linkcard', href: '#/test', style: { marginBottom: '10px' } }, h('div', { class: 'ic', style: { background: 'var(--lav-soft)', color: 'var(--lav)' }, html: I('clipboard') }), h('div', null, h('b', null, 'Test-Baukasten'), h('span', { class: 'small muted' }, 'Zufällige Tests: gesamt oder pro Kapitel, 10 bis alle Fragen, mit Note · Komplett-Check')), h('span', { class: 'go', html: I('chevR') })));
   const fp = S.full && S.full.order ? Math.min(S.full.pos, S.full.order.length) : 0;
   s.append(h('div', { class: 'modes' },
-    h('a', { class: 'mode', href: '#/show', style: { '--c': 'var(--sun)' } }, h('div', { class: 'ic', html: I('trophy') }), h('div', null, h('b', null, 'Wer wird Tierärztin?'), h('span', { class: 'sub' }, '15 Fragen, immer schwerer · 3 Joker · 3 Leben')), h('span', { class: 'go', html: I('chevR') })),
+    h('a', { class: 'mode', href: '#/show', style: { '--c': 'var(--sun)' } }, h('div', { class: 'ic', html: I('trophy') }), h('div', null, h('b', null, 'Wer wird Bio-Profi?'), h('span', { class: 'sub' }, '15 Fragen, immer schwerer · 3 Joker · 3 Leben')), h('span', { class: 'go', html: I('chevR') })),
     h('a', { class: 'mode', href: '#/alle', style: { '--c': 'var(--accent)' } }, h('div', { class: 'ic', html: I('list') }), h('div', null, h('b', null, 'Der große Durchgang'), h('span', { class: 'sub' }, fp ? `Aufgabe ${fp} von ${S.full.order.length} · weitermachen` : `alle ${ALL_QUESTIONS.length} Aufgaben des Prüfstoffs`)), h('span', { class: 'go', html: I('chevR') }))));
   s.append(h('div', { class: 'section-title' }, ico('list'), 'Oder gezielt üben'));
   s.append(h('div', { class: 'modes' },
@@ -648,16 +653,16 @@ function quiz({ chapter: cid, level, mix, sheet: sheetIdx, retry, custom }) {
     const gain = Math.round((lv === 2 ? 20 : 10) * res.score + (res.ok ? Math.min(10, Math.max(0, combo - 1) * 2) : 0));
     xp += gain;
     if (res.ok) snd.correct(combo); else snd.wrong();
-    if (combo >= 3) { comboEl.replaceChildren(ico('flame'), String(combo)); comboEl.classList.remove('hot'); void comboEl.offsetWidth; comboEl.classList.add('hot'); if (combo % 5 === 0) snd.purr(1.2, 0.4); } else comboEl.replaceChildren();
+    if (combo >= 3) { comboEl.replaceChildren(ico('flame'), String(combo)); comboEl.classList.remove('hot'); void comboEl.offsetWidth; comboEl.classList.add('hot'); if (combo % 5 === 0) snd.success(1, 0.3); } else comboEl.replaceChildren();
     if (!res.ok && res.score < 0.5 && !requeued.has(q.id + ':' + lv)) { requeued.add(q.id + ':' + lv); queue.splice(Math.min(queue.length, pos + 3), 0, { q, level: lv }); }
     save();
     feedbackSheet(res, gain);
   }
   function feedbackSheet(res, gain) {
     const ok = res.ok;
-    const head = ok ? pick(['Super!', 'Miau-tastisch!', 'Perfekt!', 'Pfotenstark!', 'Richtig!', 'Schnurr-genial!']) : (res.score >= 0.5 ? 'Fast!' : pick(['Nicht ganz.', 'Hoppla!', 'Noch nicht.']));
+    const head = ok ? pick(['Super!', 'Perfekt!', 'Richtig!', 'Stark!', 'Genau so!', 'Klasse!']) : (res.score >= 0.5 ? 'Fast!' : pick(['Nicht ganz.', 'Hoppla!', 'Noch nicht.']));
     const el = h('div', { class: 'sheet ' + (ok ? 'ok' : 'bad') }, h('div', { class: 'inner' },
-      h('div', { class: 'head', html: (ok ? docSVG('wink') : docSVG('sick')) + `<span>${head}${gain ? ` <span class="small">+${gain} Leckerli</span>` : ''}</span>` }),
+      h('div', { class: 'head', html: emblem(ok ? 'good' : 'oops') + `<span>${head}${gain ? ` <span class="small">+${gain} Punkte</span>` : ''}</span>` }),
       h('div', { class: 'expl', html: (res.html || '') + explainMore(queue[pos].q, res) }),
       h('button', { class: 'btn', onclick: () => { el.remove(); pos++; next(); } }, ok ? 'Weiter' : 'Verstanden, weiter', ico('arrowR'))));
     document.body.append(el);
@@ -672,7 +677,7 @@ function quiz({ chapter: cid, level, mix, sheet: sheetIdx, retry, custom }) {
     if ((level === 2 || sheetIdx != null) && pct >= 0.5) S.stats.typedRound = true;
     save();
     snd.moodMusic(S.settings.track);
-    if (stars >= 2) { snd.purr(1.8, 0.45); confetti(stars === 3 ? 90 : 40); } else snd.meow({ pitch: 0.9 });
+    if (stars >= 2) { snd.success(1.8, 0.45); confetti(stars === 3 ? 90 : 40); } else snd.chime({ pitch: 0.9 });
     const ch = cid ? chapterById(cid) : null;
     meta.replaceChildren(h('span', null, title + ' · fertig'));
     body.innerHTML = '';
@@ -680,11 +685,11 @@ function quiz({ chapter: cid, level, mix, sheet: sheetIdx, retry, custom }) {
     const starEl = h('div', { class: 'stars' });
     for (let k = 0; k < 3; k++) starEl.append(frag(I('star', k < stars ? 'on' : '')));
     body.append(h('div', { class: 'result card' },
-      h('div', { class: 'cat', html: ch ? patientSVG(ch) : docSVG(stars >= 2 ? 'wow' : 'happy') }),
+      h('div', { class: 'art', html: ch ? chapterPic(ch) : emblem(stars >= 2 ? 'wow' : 'happy') }),
       starEl,
       h('h2', null, stars === 3 ? 'Ausgezeichnet!' : stars === 2 ? 'Sehr gut gemacht!' : stars === 1 ? 'Guter Anfang!' : 'Weiter üben, du schaffst das!'),
-      ch ? h('p', { class: 'muted' }, `${catById(ch.cat).name} ist jetzt zu ${Math.round(chapterMastery(cid) * 100)} % gesund.`) : null,
-      h('div', { class: 'stats' }, h('div', { class: 'stat' }, h('b', null, Math.round(pct * 100) + ' %'), h('span', null, 'beim ersten Versuch')), h('div', { class: 'stat' }, h('b', null, '+' + (xp + stars * 5)), h('span', null, 'Leckerli')), h('div', { class: 'stat' }, h('b', null, String(S.stats.bestCombo)), h('span', null, 'beste Serie'))),
+      ch ? h('p', { class: 'muted' }, `„${ch.short}“ kannst du jetzt zu ${Math.round(chapterMastery(cid) * 100)} % sicher.`) : null,
+      h('div', { class: 'stats' }, h('div', { class: 'stat' }, h('b', null, Math.round(pct * 100) + ' %'), h('span', null, 'beim ersten Versuch')), h('div', { class: 'stat' }, h('b', null, '+' + (xp + stars * 5)), h('span', null, 'Punkte')), h('div', { class: 'stat' }, h('b', null, String(S.stats.bestCombo)), h('span', null, 'beste Serie'))),
       h('div', { class: 'stack' },
         h('button', { class: 'btn block', onclick: () => route() }, ico('refresh'), 'Noch eine Runde'),
         cid && level === 1 && pct >= 0.7 ? h('a', { class: 'btn coral block', href: `#/ueben/${cid}/2` }, ico('pen'), 'Weiter mit Stufe 2') : null,
@@ -695,7 +700,7 @@ function quiz({ chapter: cid, level, mix, sheet: sheetIdx, retry, custom }) {
 }
 
 
-/* ================= Wer wird Tierärztin? (quiz show) ================= */
+/* ================= Wer wird Bio-Profi? (quiz show) ================= */
 const LADDER = [10, 20, 30, 50, 80, 120, 160, 200, 250, 300, 400, 500, 650, 800, 1000];
 const CHOICE = new Set(['mc', 'pick']);
 function showPools() {
@@ -730,14 +735,14 @@ function showIntro() {
   const best = S.showBest || 0;
   const s = h('div', { class: 'screen' });
   s.append(h('div', { class: 'card intro' },
-    h('div', { class: 'cat', html: docSVG('wow', ['crown']) }),
-    h('h1', null, 'Wer wird Tierärztin?'),
-    h('p', { class: 'muted' }, 'Die Quizshow der Katzenklinik. 15 Fragen aus dem ganzen Stoff, jede Stufe ein bisschen schwerer.'),
+    h('div', { class: 'art', html: emblem('wow') }),
+    h('h1', null, 'Wer wird Bio-Profi?'),
+    h('p', { class: 'muted' }, 'Die große Bio-Quizshow. 15 Fragen aus dem ganzen Stoff, jede Stufe ein bisschen schwerer.'),
     h('ul', null,
       h('li', null, ico('list'), h('span', null, 'Fragen 1–5: Auswahl. Fragen 6–10: Zuordnen, Reihenfolge, Beschriften. Fragen 11–15: selbst eintippen.')),
-      h('li', null, ico('sparkle'), h('span', null, '3 Joker: 50:50, Tipp von Dr. Schnurrhaar, Frage tauschen. Jeder nur einmal.')),
-      h('li', null, ico('paw'), h('span', null, '3 Leben. Nach jeder Antwort siehst du die Erklärung, so lernst du auch aus Fehlern.')),
-      h('li', null, ico('fish'), h('span', null, 'Bis zu 1000 Leckerli. Dein Rekord: Stufe ' + best + ' von 15.'))),
+      h('li', null, ico('sparkle'), h('span', null, '3 Joker: 50:50, Tipp, Frage tauschen. Jeder nur einmal.')),
+      h('li', null, ico('heart'), h('span', null, '3 Leben. Nach jeder Antwort siehst du die Erklärung, so lernst du auch aus Fehlern.')),
+      h('li', null, ico('star'), h('span', null, 'Bis zu 1000 Punkte. Dein Rekord: Stufe ' + best + ' von 15.'))),
     h('a', { class: 'btn sun block', href: '#/show/los' }, ico('trophy'), 'Show starten')));
   app.append(s);
 }
@@ -762,8 +767,8 @@ function showRun() {
   app.append(s);
   render();
   function drawTop() {
-    ladder.replaceChildren(...LADDER.map((v, k) => h('i', { class: (k < step ? 'done' : k === step ? 'on' : '') + (k === 4 || k === 9 ? ' safe' : ''), title: v + ' Leckerli' })));
-    livesEl.replaceChildren(...Array.from({ length: 3 }, (_, k) => frag(I('paw', k < lives ? 'on' : 'off'))));
+    ladder.replaceChildren(...LADDER.map((v, k) => h('i', { class: (k < step ? 'done' : k === step ? 'on' : '') + (k === 4 || k === 9 ? ' safe' : ''), title: v + ' Punkte' })));
+    livesEl.replaceChildren(...Array.from({ length: 3 }, (_, k) => frag(I('heart', k < lives ? 'on' : 'off'))));
   }
   function render() {
     if (step >= qs.length) return finish(true);
@@ -773,9 +778,9 @@ function showRun() {
     const mkJ = (key, ic, label, enabled, fn) => { const b = h('button', { class: 'joker', disabled: !(jokers[key] && enabled) }, ico(ic), label); b.onclick = () => { jokers[key] = false; if (key !== 'swap') jokerUsed = true; snd.whoosh(); fn(); }; return b; };
     const isChoice = (q.t === 'fact' && level === 1) || CHOICE.has(q.t);
     jrow.replaceChildren(
-      h('div', { class: 'stepinfo' }, h('b', null, `Frage ${step + 1} von 15`), h('span', null, `um ${LADDER[step]} Leckerli`)),
+      h('div', { class: 'stepinfo' }, h('b', null, `Frage ${step + 1} von 15`), h('span', null, `um ${LADDER[step]} Punkte`)),
       mkJ('fifty', 'target', '50:50', isChoice, () => draw({ fifty: true })),
-      mkJ('hint', 'bulb', 'Tipp', !!hintFor(q, level), () => { hintBox.replaceChildren(h('div', { class: 'box tip' }, h('span', { class: 't' }, ico('steth'), 'Dr. Schnurrhaar flüstert:'), hintFor(q, level))); render2(); }),
+      mkJ('hint', 'bulb', 'Tipp', !!hintFor(q, level), () => { hintBox.replaceChildren(h('div', { class: 'box tip' }, h('span', { class: 't' }, ico('bulb'), 'Tipp:'), hintFor(q, level))); render2(); }),
       mkJ('swap', 'refresh', 'Tauschen', true, () => { const pool = step < 5 ? A : step < 10 ? B : C; const alt = spread(pool, 1, used)[0]; if (alt) qs[step] = alt; render(); }),
     );
     draw({});
@@ -795,7 +800,7 @@ function showRun() {
     if (ok) { snd.correct(step); if (step === 4 || step === 9) snd.fanfare(); } else { lives--; snd.wrong(); }
     drawTop();
     const el = h('div', { class: 'sheet ' + (ok ? 'ok' : 'bad') }, h('div', { class: 'inner' },
-      h('div', { class: 'head', html: (ok ? docSVG('wink') : docSVG('sick')) + `<span>${ok ? (step === 14 ? 'Gewonnen!' : `Richtig! ${LADDER[step]} Leckerli`) : (lives > 0 ? `Leider falsch. Noch ${lives} ${lives === 1 ? 'Leben' : 'Leben'}` : 'Leider falsch, keine Leben mehr')}</span>` }),
+      h('div', { class: 'head', html: emblem(ok ? 'good' : 'oops') + `<span>${ok ? (step === 14 ? 'Gewonnen!' : `Richtig! ${LADDER[step]} Punkte`) : (lives > 0 ? `Leider falsch. Noch ${lives} ${lives === 1 ? 'Leben' : 'Leben'}` : 'Leider falsch, keine Leben mehr')}</span>` }),
       h('div', { class: 'expl', html: (res.html || '') + explainMore(q, res) }),
       h('button', { class: 'btn', onclick: () => { el.remove(); if (ok) step++; else if (lives > 0) { const pool = step < 5 ? A : step < 10 ? B : C; const alt = spread(pool, 1, used)[0]; if (alt) qs[step] = alt; } if (lives <= 0) finish(false); else render(); } }, lives > 0 || ok ? 'Weiter' : 'Ergebnis', ico('arrowR'))));
     document.body.append(el);
@@ -810,14 +815,14 @@ function showRun() {
     gainXP(prize);
     save();
     snd.moodMusic(S.settings.track);
-    if (won) { snd.fanfare(); confetti(120); } else if (reached >= 5) { snd.purr(1.6, 0.4); confetti(40); } else snd.meow();
+    if (won) { snd.fanfare(); confetti(120); } else if (reached >= 5) { snd.success(1.6, 0.4); confetti(40); } else snd.chime();
     jrow.replaceChildren(); hintBox.replaceChildren(); drawTop();
     S.retry = missed.map((m) => ({ id: m.id, level: m.level })); save();
     body.replaceChildren(h('div', { class: 'result card' },
-      h('div', { class: 'cat', html: docSVG(won ? 'wow' : 'happy', won ? ['crown'] : ['stetho']) }),
+      h('div', { class: 'art', html: emblem(won ? 'wow' : 'happy') }),
       h('div', { class: 'grade' }, `${reached}/15`),
-      h('h2', null, won ? 'Du bist Tierärztin! Alle 15 Fragen geschafft.' : reached >= 10 ? 'Großartig, fast ganz oben!' : reached >= 5 ? 'Gut gemacht!' : 'Guter Versuch!'),
-      h('div', { class: 'stats' }, h('div', { class: 'stat' }, h('b', null, String(reached)), h('span', null, 'Stufen')), h('div', { class: 'stat' }, h('b', null, '+' + prize), h('span', null, 'Leckerli')), h('div', { class: 'stat' }, h('b', null, String(S.showBest)), h('span', null, 'Rekord'))),
+      h('h2', null, won ? 'Du bist Bio-Profi! Alle 15 Fragen geschafft.' : reached >= 10 ? 'Großartig, fast ganz oben!' : reached >= 5 ? 'Gut gemacht!' : 'Guter Versuch!'),
+      h('div', { class: 'stats' }, h('div', { class: 'stat' }, h('b', null, String(reached)), h('span', null, 'Stufen')), h('div', { class: 'stat' }, h('b', null, '+' + prize), h('span', null, 'Punkte')), h('div', { class: 'stat' }, h('b', null, String(S.showBest)), h('span', null, 'Rekord'))),
       h('div', { class: 'stack' }, h('button', { class: 'btn sun block', onclick: () => route() }, ico('refresh'), 'Nochmal spielen'),
         missed.length ? h('a', { class: 'btn coral block', href: '#/nochmal' }, ico('target'), `Nur die ${missed.length} Fehler nochmal`) : null,
         h('a', { class: 'btn ghost block', href: '#/mix' }, 'Zurück'))));
@@ -841,7 +846,7 @@ function fullIntro() {
   const F = S.full;
   const s = h('div', { class: 'screen' });
   const c = h('div', { class: 'card intro' },
-    h('div', { class: 'cat', html: docSVG('happy', ['book']) }),
+    h('div', { class: 'art', html: emblem('book') }),
     h('h1', null, 'Der große Durchgang'),
     h('p', { class: 'muted' }, `Alle ${ALL_QUESTIONS.length} Aufgaben des Prüfstoffs, eine nach der anderen. Du kannst jederzeit aufhören und später weitermachen.`),
     h('ul', null,
@@ -900,7 +905,7 @@ function fullRun() {
          h('button', { class: 'btn ghost', onclick: () => { record(key, false, 0.5); F.guessed++; later(); gainXP(3); go(); } }, 'Geraten')]
       : [h('button', { class: 'btn', onclick: () => { record(key, res.ok, res.score); if (!res.ok) { F.wrong++; later(); } else { F.sure++; gainXP(8); } go(); } }, res.ok ? 'Weiter' : 'Verstanden, weiter', ico('arrowR'))];
     const el = h('div', { class: 'sheet ' + (res.ok ? 'ok' : 'bad') }, h('div', { class: 'inner' },
-      h('div', { class: 'head', html: (res.ok ? docSVG('wink') : docSVG('sick')) + `<span>${res.ok ? 'Richtig! Wie sicher warst du?' : res.score >= 0.5 ? 'Fast!' : 'Noch nicht.'}</span>` }),
+      h('div', { class: 'head', html: emblem(res.ok ? 'good' : 'oops') + `<span>${res.ok ? 'Richtig! Wie sicher warst du?' : res.score >= 0.5 ? 'Fast!' : 'Noch nicht.'}</span>` }),
       h('div', { class: 'expl', html: (res.html || '') + explainMore(q, res) }),
       h('div', { class: 'row', style: { gap: '10px' } }, ...buttons.map((b) => { b.style.flex = '1'; return b; }))));
     document.body.append(el);
@@ -909,7 +914,7 @@ function fullRun() {
     focusMode(false);
     snd.fanfare(); confetti(120);
     body.replaceChildren(h('div', { class: 'result card' },
-      h('div', { class: 'cat', html: docSVG('wow', ['crown']) }),
+      h('div', { class: 'art', html: emblem('wow') }),
       h('h2', null, 'Der ganze Prüfstoff ist durch!'),
       h('div', { class: 'stats' }, h('div', { class: 'stat' }, h('b', null, String(F.sure)), h('span', null, 'sicher gewusst')), h('div', { class: 'stat' }, h('b', null, String(F.guessed)), h('span', null, 'geraten')), h('div', { class: 'stat' }, h('b', null, String(F.wrong)), h('span', null, 'noch falsch'))),
       h('p', { class: 'muted' }, 'Was noch falsch oder geraten war, kommt jetzt bevorzugt in der Schnell-Runde.'),
@@ -973,7 +978,7 @@ function glossary(chFilter) {
     const box = h('div');
     const close = modal(box);
     const show = () => {
-      if (i >= deck.length) { box.replaceChildren(h('div', { class: 'stack center' }, h('div', { style: { width: '120px', margin: '0 auto' }, html: docSVG('wow') }), h('h2', null, `${known} von ${deck.length} gewusst`), h('button', { class: 'btn block', onclick: () => close() }, 'Fertig'))); gainXP(known); return; }
+      if (i >= deck.length) { box.replaceChildren(h('div', { class: 'stack center' }, h('div', { style: { width: '120px', margin: '0 auto' }, html: emblem('wow') }), h('h2', null, `${known} von ${deck.length} gewusst`), h('button', { class: 'btn block', onclick: () => close() }, 'Fertig'))); gainXP(known); return; }
       const g = deck[i];
       const term = h('div', { class: 'fl-term hidden-term' }, g.t);
       const reveal = h('button', { class: 'btn block' }, ico('eye'), 'Begriff zeigen');
@@ -1013,7 +1018,7 @@ function probeIntro() {
   tabs('ueben');
   const s = h('div', { class: 'screen' });
   s.append(h('div', { class: 'card intro' },
-    h('div', { class: 'cat', html: docSVG('happy', ['book']) }),
+    h('div', { class: 'art', html: emblem('book') }),
     h('h1', null, 'Probearbeit'),
     h('p', { class: 'muted' }, 'Die Generalprobe, so wie ein echter Bio-Test.'),
     h('ul', null,
@@ -1081,7 +1086,7 @@ function runExam({ items, minutes, title, againHref, history, resume }) {
     if (!minutes) { up++; clock.replaceChildren(ico('clock'), fmt(up)); return; }
     left--;
     clock.replaceChildren(ico('clock'), fmt(left));
-    if (left === 60) { toast('Noch 1 Minute!'); snd.mrrp(); }
+    if (left === 60) { toast('Noch 1 Minute!'); snd.soft(); }
     if (left <= 0) { clearInterval(tick); finish(true); }
   }, 1000);
   results.forEach((r) => { if (!r.it) { r.it = items[r.k]; r.res = r.res || { score: r.score, ok: r.ok, you: r.you, html: r.html, detail: r.detail }; } });
@@ -1116,14 +1121,14 @@ function runExam({ items, minutes, title, againHref, history, resume }) {
     gainXP(Math.round(points * 5));
     save();
     snd.moodMusic(S.settings.track);
-    if (grade <= 2) { snd.fanfare(); confetti(100); } else snd.meow();
+    if (grade <= 2) { snd.fanfare(); confetti(100); } else snd.chime();
     body.innerHTML = '';
     body.append(h('div', { class: 'result card' },
       timeUp ? h('p', null, h('span', { class: 'tag warn' }, 'Zeit abgelaufen')) : null,
-      h('div', { class: 'cat', html: docSVG(grade <= 2 ? 'wow' : 'happy', grade === 1 ? ['crown'] : ['book']) }),
+      h('div', { class: 'art', html: emblem(grade <= 2 ? 'wow' : 'book') }),
       h('div', { class: 'grade' }, String(grade)),
       h('h2', null, names[grade]),
-      h('div', { class: 'stats' }, h('div', { class: 'stat' }, h('b', null, `${points}/${max}`), h('span', null, 'Punkte')), h('div', { class: 'stat' }, h('b', null, pct + ' %'), h('span', null, 'erreicht')), h('div', { class: 'stat' }, h('b', null, '+' + Math.round(points * 5)), h('span', null, 'Leckerli'))),
+      h('div', { class: 'stats' }, h('div', { class: 'stat' }, h('b', null, `${points}/${max}`), h('span', null, 'Punkte')), h('div', { class: 'stat' }, h('b', null, pct + ' %'), h('span', null, 'erreicht')), h('div', { class: 'stat' }, h('b', null, '+' + Math.round(points * 5)), h('span', null, 'Punkte'))),
       h('p', { class: 'muted' }, grade <= 2 ? 'So kannst du am Freitag ganz entspannt hineingehen.' : 'Schau dir unten die Lösungen an und übe die Kapitel mit den meisten Fehlern nochmal.')));
     // per chapter: where does it still go wrong?
     const byCh = {};
@@ -1257,33 +1262,35 @@ function testStart() {
 }
 
 /* ================= collection, plan, settings ================= */
-function catsPage() {
-  tabs('katzen');
+function badgesPage() {
+  tabs('erfolge');
   const s = h('div', { class: 'screen' });
-  s.append(h('h1', null, 'Deine Katzen'), h('p', { class: 'muted' }, `${S.cats.length} von ${CATS.length} Katzen gesammelt. Mach Patienten gesund (Kapitel zu 80 %) und schaffe Bonus-Aufgaben.`));
-  const g = h('div', { class: 'catgrid' });
-  CATS.forEach((c) => {
-    const has = S.cats.includes(c.id);
-    const ch = CHAPTERS.find((x) => x.cat === c.id);
-    const cell = h('button', { class: 'catcell' + (has ? '' : ' locked'), html: catPic(c, has ? 'happy' : 'sleep') });
-    cell.append(h('b', null, has ? c.name : '???'), h('span', null, has ? c.breed : (c.bonus || (ch ? 'Kapitel: ' + ch.short : ''))));
+  const n = BADGES.filter((b) => S.badges.includes(b.id)).length;
+  s.append(h('h1', null, 'Deine Erfolge'), h('p', { class: 'muted' }, `${n} von ${BADGES.length} Abzeichen gesammelt. Meistere Kapitel (80 %) und schaffe Bonus-Aufgaben.`));
+  const g = h('div', { class: 'badgegrid' });
+  BADGES.forEach((b) => {
+    const has = S.badges.includes(b.id);
+    const ch = b.ch ? chapterById(b.ch) : null;
+    const how = b.bonus || (ch ? `Kapitel „${ch.short}“ zu 80 %` : '');
+    const cell = h('button', { class: 'badgecell' + (has ? '' : ' locked'), html: badgeSVG(b, has) });
+    cell.append(h('b', null, has ? b.name : '???'), h('span', null, how));
     cell.onclick = () => {
       snd.ensure();
-      if (has) { snd.meow({ pitch: 0.85 + Math.random() * 0.4 }); setTimeout(() => snd.purr(1.6, 0.4), 700); } else snd.mrrp();
+      if (has) snd.success(1.2, 0.35); else snd.soft();
       const close = modal(h('div', { class: 'stack center' },
-        h('div', { style: { width: '170px', margin: '0 auto' }, html: catPic(c, has ? 'happy' : 'sleep', has ? ['heart'] : ['zzz']) }),
-        h('h2', null, has ? c.name : 'Noch nicht freigeschaltet'),
-        h('p', { class: 'muted' }, has ? c.breed : (c.bonus ? 'So bekommst du diese Katze: ' + c.bonus : `Mach ${c.name} im Kapitel „${ch.title}“ gesund (80 %).`)),
-        h('div', { class: 'box vet', style: { textAlign: 'left' } }, h('span', { class: 't' }, ico('paw'), 'Tierärztinnen-Wissen'), has ? c.fact : 'Dieses Wissen bekommst du, wenn du die Katze freigeschaltet hast.'),
+        h('div', { style: { width: '150px', margin: '0 auto' }, html: badgeSVG(b, has) }),
+        h('h2', null, has ? b.name : 'Noch nicht freigeschaltet'),
+        h('p', { class: 'muted' }, has ? 'Freigeschaltet: ' + how : 'So bekommst du dieses Abzeichen: ' + how),
+        h('div', { class: 'box tip', style: { textAlign: 'left' } }, h('span', { class: 't' }, ico('bulb'), 'Wusstest du?'), has ? b.fact : 'Dieses Wissen bekommst du, wenn du das Abzeichen freigeschaltet hast.'),
         h('button', { class: 'btn block', onclick: () => close() }, 'Schließen')));
     };
     g.append(cell);
   });
   s.append(g);
-  s.append(h('div', { class: 'section-title' }, ico('steth'), 'Deine Karriere'));
+  s.append(h('div', { class: 'section-title' }, ico('medal'), 'Deine Ränge'));
   const r = rankFor();
   const c = h('div', { class: 'card' });
-  RANKS.forEach((rk, i) => c.append(h('div', { class: 'task' + (i <= r.i ? '' : ' done') }, h('span', { html: I(i <= r.i ? 'check' : 'clock') }), h('b', { style: { flex: 1 } }, rk.title), h('span', { class: 'small muted' }, rk.xp + ' Leckerli'))));
+  RANKS.forEach((rk, i) => c.append(h('div', { class: 'task rank' + (i <= r.i ? '' : ' locked') }, h('span', { html: I(i <= r.i ? 'check' : 'lock') }), h('b', { style: { flex: 1 } }, rk.icon + ' ' + rk.title), h('span', { class: 'small muted' }, rk.xp + ' Punkte'))));
   s.append(c);
   app.append(s);
 }
@@ -1325,8 +1332,8 @@ function voicePicker() {
     if (!vs.length) { wrap.append(h('span', { class: 'small muted' }, 'Keine deutsche Stimme gefunden.')); return; }
     const cur = voice.currentVoice();
     const sel = h('select', { id: 'set-voice' }, vs.map((v) => { const o = h('option', { value: v.name }, `${v.name} (${v.lang})`); if (cur && v.name === cur.name) o.selected = true; return o; }));
-    sel.onchange = () => { voice.chooseVoice(sel.value); voice.speak('Hallo! Ich bin Doktor Schnurrhaar. So klinge ich.', () => {}); };
-    const test = h('button', { class: 'btn ghost small', onclick: () => voice.speak('Hallo! Ich bin Doktor Schnurrhaar. Die Amylase spaltet Stärke zu Maltose.', () => {}) }, ico('play'), 'Probehören');
+    sel.onchange = () => { voice.chooseVoice(sel.value); voice.speak('Hallo! So klinge ich, wenn ich dir Bio erkläre.', () => {}); };
+    const test = h('button', { class: 'btn ghost small', onclick: () => voice.speak('Hallo! Die Amylase spaltet Stärke zu Maltose.', () => {}) }, ico('play'), 'Probehören');
     wrap.append(h('div', { class: 'row' }, h('div', { style: { flex: 1, minWidth: 0 } }, sel), test),
       h('span', { class: 'small muted' }, 'Am besten klingen Stimmen mit „Premium“, „Erweitert“ oder „Natural“ im Namen. Am iPhone kannst du sie unter Einstellungen → Bedienungshilfen → Gesprochene Inhalte → Stimmen → Deutsch laden.'));
   };
@@ -1349,7 +1356,7 @@ function settingsPage() {
   c.append(
     h('div', { class: 'field' }, h('label', { for: 'set-name' }, 'Dein Name'), name),
     h('div', { class: 'field' }, h('label', { for: 'set-date' }, 'Datum des Bio-Tests'), date),
-    toggle('Töne (Miau, Schnurren …)', 'sound', (on) => on && snd.meow()),
+    toggle('Töne (Klänge bei richtig und falsch)', 'sound', (on) => on && snd.chime()),
     toggle('Hintergrundmusik', 'music', (on) => snd.setMusic(on)),
     h('div', { class: 'field' }, h('label', { for: 'set-track' }, 'Musikstück'), sel('set-track', Object.entries(snd.TRACKS).map(([k, v]) => [k, v.name]), S.settings.track, (v) => { snd.setMusic(true, v); topbar(); })),
     toggle('Stimme in den Erklär-Filmen', 'voice'),
@@ -1361,12 +1368,12 @@ function settingsPage() {
   s.append(h('div', { class: 'card' },
     h('h3', null, 'Auf dem iPhone installieren'),
     h('ol', { style: { paddingLeft: '1.2em', margin: '0 0 8px' } }, h('li', null, 'Diese Seite in Safari öffnen'), h('li', null, 'Unten auf „Teilen“ (Quadrat mit Pfeil) tippen'), h('li', null, '„Zum Home-Bildschirm“ wählen')),
-    h('p', { class: 'small muted', style: { margin: 0 } }, 'Danach startet Schnurrologie wie eine App und funktioniert auch offline. Dein Fortschritt bleibt auf diesem Gerät gespeichert.')));
+    h('p', { class: 'small muted', style: { margin: 0 } }, `Danach startet ${APP_NAME} wie eine App und funktioniert auch offline. Dein Fortschritt bleibt auf diesem Gerät gespeichert.`)));
   s.append(h('div', { class: 'card' },
     h('h3', null, 'Fortschritt'),
-    h('p', { class: 'small muted' }, `${S.stats.answered} Antworten · ${S.stats.correct} richtig · ${S.cats.length} Katzen`),
+    h('p', { class: 'small muted' }, `${S.stats.answered} Antworten · ${S.stats.correct} richtig · ${S.badges.length} Abzeichen`),
     h('button', { class: 'btn ghost small', onclick: () => ask('Wirklich allen Fortschritt löschen?', 'Ja, alles löschen', () => { reset(); route(); }) }, 'Alles zurücksetzen')));
-  s.append(h('p', { class: 'small muted center', style: { marginTop: '16px' } }, 'Schnurrologie · gebaut für eine zukünftige Tierärztin'));
+  s.append(h('p', { class: 'small muted center', style: { marginTop: '16px' } }, `${APP_NAME} · gebaut für den Bio-Test am 13. November`));
   app.append(s);
 }
 
@@ -1374,7 +1381,7 @@ function settingsPage() {
 document.body.prepend(h('header', { id: 'top' }, h('div', { class: 'inner' })));
 document.body.append(
   h('nav', { id: 'tabs', 'aria-label': 'Hauptmenü' }, h('div', { class: 'inner' },
-    [['start', '#/', 'clinic', 'Klinik'], ['lernen', '#/themen', 'book', 'Kapitel'], ['ueben', '#/mix', 'bolt', 'Üben'], ['katzen', '#/katzen', 'cat', 'Katzen'], ['plan', '#/plan', 'calendar', 'Plan']]
+    [['start', '#/', 'home', 'Start'], ['lernen', '#/themen', 'book', 'Kapitel'], ['ueben', '#/mix', 'bolt', 'Üben'], ['erfolge', '#/erfolge', 'trophy', 'Erfolge'], ['plan', '#/plan', 'calendar', 'Plan']]
       .map(([k, href, ic, label]) => h('a', { href, 'data-tab': k, html: I(ic) + `<span>${label}</span>` })))),
   h('div', { id: 'toast' }),
   h('canvas', { id: 'fx' }),
