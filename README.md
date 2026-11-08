@@ -14,6 +14,7 @@ Jedes Kapitel zeigt mit einem Ring, wie sicher du es kannst. Ab 80 % ist es geme
 - **Abbildungen zum Beschriften**, nachgezeichnet wie auf den Arbeitsblättern (Nervenzelle mit denselben Nummern 1–9)
 - **Stufe 1 (antippen)**: Auswahl, Zuordnen, Reihenfolge, Sortieren, Lückentext, Beschriften, Enzym-Tabelle
 - **Stufe 2 (eintippen)**: selbst schreiben, kleine Tippfehler werden verziehen und die richtige Schreibweise gezeigt
+- **Quellen zum Nachprüfen**: Jede Aufgabe, jede Abbildung, jede Steckbrief-Karte und jeder Abschnitt der Lernkarten zeigt, wo es im Heft steht (Seite, Aufgabe, Text, Kasten oder Abbildung). Was nicht im Heft steht, ist als **Zusatzwissen** markiert und hat einen Link zum Nachlesen
 - **Prüfstoff Seite für Seite**: jede Heftseite mit ihren Inhalten und allen Aufgaben vom Blatt als Übung (siehe [ABDECKUNG.md](ABDECKUNG.md))
 - **Wer wird Bio-Profi?**: Quizshow mit 15 Stufen, 3 Jokern (50:50, Tipp, Tauschen) und 3 Leben
 - **Der große Durchgang**: alle Aufgaben des Prüfstoffs am Stück, mit „sicher gewusst / geraten“; Geratenes kommt wieder
@@ -44,6 +45,7 @@ js/engine.js        Aufgabentypen, Stufe 1/2, Probearbeit
 js/content.js       Alle Inhalte, Fragen, Steckbrief-Karten, Lernplan
 js/diagrams.js      Die nachgezeichneten Abbildungen (SVG)
 js/brand.js         Logo, Abzeichen und Illustrationen (SVG)
+js/sources.js       Quellen: Heftseite und Aufgabe zu jeder Übung, Abbildung und Karte
 js/audio.js         Töne und Musik (Web Audio)
 js/store.js         Fortschritt, Ränge, Karteikasten
 js/icons.js         Symbole

@@ -627,3 +627,31 @@ body.noscroll { overflow: hidden; }
 
 .chip.toggle { padding: 8px 12px; border: 1px solid var(--line); background: var(--card); border-radius: 99px; font-weight: 700; font-size: .9rem; }
 .chip.toggle.on { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
+
+/* sources: where every exercise, figure, card and section comes from in the booklet */
+.src { display: grid; gap: 2px; font-size: .8rem; line-height: 1.35; font-weight: 600; color: var(--muted); }
+.src .srclbl { display: inline-flex; align-items: center; gap: 5px; font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+.src .srclbl .ico { width: 14px; height: 14px; flex: none; }
+.src.heft .srclbl { color: var(--primary); }
+.src.app .srclbl { color: var(--lav); }
+.src.zusatz .srclbl { color: color-mix(in srgb, var(--sun) 70%, var(--ink)); }
+.src .srcwhere { color: var(--ink); font-weight: 600; }
+.src .srcwhere b { font-weight: 800; }
+.src .srcwhere a { color: var(--primary); font-weight: 800; }
+.src .srcnote { display: block; color: var(--muted); font-weight: 600; font-style: italic; margin-top: 2px; }
+.qsrc { margin: 0 0 10px; padding: 8px 10px; border-radius: 10px; background: var(--bg2); border-left: 3px solid var(--primary); }
+.qsrc:has(.src.app) { border-left-color: var(--lav); }
+.qsrc:has(.src.zusatz) { border-left-color: var(--sun); }
+.qcardx .qsrc { margin: 10px 0 0; }
+.secsrc { margin: -2px 0 10px; padding: 6px 10px; border-radius: 10px; background: var(--bg2); }
+.figsrc { padding: 6px 8px 4px; }
+.nachlesen { margin-top: 10px; background: color-mix(in srgb, var(--card) 75%, transparent); border-radius: 12px; padding: 10px 12px; display: grid; gap: 6px; }
+.nachlesen .howto-t .ico { color: var(--primary); }
+.filmsrc { position: absolute; left: 10px; bottom: 10px; z-index: 3; display: inline-flex; align-items: center; gap: 5px; max-width: 70%;
+  background: color-mix(in srgb, var(--card) 92%, transparent); border: 1px solid var(--line); border-radius: 99px; padding: 3px 10px; font-size: .74rem; font-weight: 800; color: var(--ink); }
+.player .stage .filmsrc svg.ico { width: 14px; height: 14px; flex: none; color: var(--primary); }
+.chip .chipsrc { margin-left: 6px; font-size: .74rem; font-weight: 700; color: var(--muted); }
+.box.extra { background: var(--sun-soft); border-color: color-mix(in srgb, var(--sun) 25%, transparent); border-style: dashed; }
+.box.extra .t { color: color-mix(in srgb, var(--sun) 70%, var(--ink)); }
+.box.heft { background: var(--bg2); border-color: color-mix(in srgb, var(--primary) 30%, transparent); }
+.box.heft .t { color: var(--primary); }

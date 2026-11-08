@@ -1,5 +1,6 @@
 /* All learning content. Based on the 11 worksheet pages (Verdauung + Nervenzelle), simplified and corrected.
    ⚠️ boxes mark places where the worksheet or a handwritten answer was wrong or incomplete. */
+import { Q_SRC, CARD_SRC } from './sources.js';
 
 /* ---------- question builders ---------- */
 const F = (q, a, alts = [], wrong = [], ex = '') => ({ t: 'fact', q, a, alts: [a, ...alts], wrong, ex });
@@ -107,7 +108,7 @@ export const CHAPTERS = [
 <li><b>Milchgebiss:</b> 2 – 1 – 2 (I – C – M, <b>keine Prämolaren</b>) → 5 × 4 = <b>20 Zähne</b></li>
 </ul>
 <div class="box merk"><span class="t">💡 Merksatz</span>Erwachsene: <b>2-1-2-3 → 32</b>. Kinder: <b>2-1-2 → 20</b>.</div>
-<div class="box tip"><span class="t">🦠 Wusstest du?</span>Ein Tropfen Speichel enthält ca. 10 Millionen Mikroorganismen, vor allem <b>Streptokokken</b> (kugelförmige Bakterien). Sie spielen bei der Entstehung von <b>Karies</b> eine große Rolle.</div>
+<div class="box heft"><span class="t">Wusstest du? (Heft Seite 4, Kasten)</span>Ein Tropfen Speichel enthält ca. 10 Millionen Mikroorganismen, vor allem <b>Streptokokken</b> (kugelförmige Bakterien). Sie spielen bei der Entstehung von <b>Karies</b> eine große Rolle.</div>
 <h2>Die Speiseröhre</h2>
 <ul>
 <li>Mehr als 20 Muskeln und der <b>Kehldeckel</b> sorgen beim Schlucken dafür, dass der Bissen in die Speiseröhre kommt und nicht in die <b>Luftröhre</b>.</li>
@@ -115,8 +116,8 @@ export const CHAPTERS = [
 <li>Transport durch die <b class="k">Peristaltik</b>: eine unwillkürliche, wellenförmige Muskelbewegung.</li>
 <li>Am Ende sitzt ein <b>Schließmuskel</b>. Er wirkt wie ein Ventil: Der Speisebrei kommt in den Magen, aber nicht zurück.</li>
 </ul>
-<div class="box tip"><span class="t">🤸 Kopfstand-Versuch</span>Man kann sogar im Kopfstand Wasser schlucken. <b>Begründung:</b> Die Peristaltik schiebt die Nahrung aktiv weiter, die Schwerkraft braucht es dafür nicht.</div>
-<div class="box tip"><span class="t">💡 Wusstest du?</span>Der Zahnschmelz ist das härteste Material in deinem Körper. Trotzdem können Bakterien ihn mit Säure angreifen: So entsteht Karies.</div>
+<div class="box heft"><span class="t">Kopfstand-Versuch (Heft Seite 4, Kasten „Nachweis der Peristaltik“)</span>Man kann sogar im Kopfstand Wasser schlucken. <b>Begründung:</b> Die Peristaltik schiebt die Nahrung aktiv weiter, die Schwerkraft braucht es dafür nicht.</div>
+<div class="box extra"><span class="t">Zusatzwissen (nicht im Heft)</span>Der Zahnschmelz ist das härteste Material in deinem Körper. Trotzdem können Bakterien ihn mit Säure angreifen: So entsteht Karies.</div>
 `,
     video: [
       { intro: true, say: 'Jetzt schauen wir in den Mund, denn hier beginnt die Verdauung.' },
@@ -179,11 +180,11 @@ export const CHAPTERS = [
 <p>Das aktive <b class="k">Pepsin</b> spaltet <b>Proteine</b> in kürzere Ketten, die <b>Peptide</b>.</p>
 <div class="box merk"><span class="t">💡 Eselsbrücke</span><b>Haupt</b>zellen machen die <b>Haupt</b>sache: das Enzym (Pepsinogen).<br><b>Beleg</b>zellen <b>belegen</b> alles mit Säure.<br><b>Neben</b>zellen schützen <b>neben</b>bei mit Schleim.</div>
 <div class="box fix"><span class="t">⚠️ Korrektur zu Seite 5 (Aufgabe b, Belegzellen)</span>Da steht: „wandelt sie das inaktive Enzym <s>zu Pepsinogen</s> um“.<br>Richtig: Die <b>Salzsäure wandelt das inaktive Pepsinogen in das aktive Pepsin um.</b></div>
-<div class="box tip"><span class="t">🤔 Warum wird Pepsin erst inaktiv gebildet?</span>Sonst würde das Enzym schon die Zellen verdauen, die es herstellen. Erst im Magen macht die Salzsäure es scharf, und der Schleim schützt die Magenwand.</div>
+<div class="box tip"><span class="t">🤔 Warum wird Pepsin erst inaktiv gebildet? (Erklärung der App)</span>Sonst würde das Enzym schon die Zellen verdauen, die es herstellen. Erst im Magen macht die Salzsäure es scharf, und der Schleim schützt die Magenwand.</div>
 <h3>Sodbrennen</h3>
 <p>Ein <b>brennender Schmerz hinter dem Brustbein</b>. Er entsteht, wenn saurer Magensaft (Salzsäure) in die <b>Speiseröhre</b> zurückfließt, weil der Schließmuskel des Magenmundes nicht dicht schließt.</p>
-<div class="box tip"><span class="t">⏱️ Wusstest du?</span>Fisch bleibt gut 1 Stunde im Magen, Schweinebraten 5–7 Stunden, Ölsardinen bis zu 12 Stunden. Fett bleibt am längsten. Wird ein <b>leerer</b> Magen durchgeknetet, knurrt er.</div>
-<div class="box tip"><span class="t">💡 Wusstest du?</span>Die oberste Schicht der Magenschleimhaut erneuert sich alle paar Tage. So bleibt die Magenwand trotz Salzsäure geschützt.</div>
+<div class="box heft"><span class="t">Wusstest du? (Heft Seite 6, Kasten)</span>Fisch bleibt gut 1 Stunde im Magen, Schweinebraten 5–7 Stunden, Ölsardinen bis zu 12 Stunden. Fett bleibt am längsten. Wird ein <b>leerer</b> Magen durchgeknetet, knurrt er.</div>
+<div class="box extra"><span class="t">Zusatzwissen (nicht im Heft)</span>Die oberste Schicht der Magenschleimhaut erneuert sich alle paar Tage. So bleibt die Magenwand trotz Salzsäure geschützt.</div>
 `,
     video: [
       { intro: true, say: 'Willkommen im Magen, der Knetmaschine unseres Körpers!' },
@@ -253,7 +254,7 @@ export const CHAPTERS = [
 </ul>
 <div class="box fix"><span class="t">⚠️ Korrektur zu Seite 7</span>Im Heft steht: „Die Enzyme aus der Bauchspeicheldrüse <s>und Gallenblase</s> sind für die endgültige Spaltung … notwendig.“<br>Die <b>Gallenblase liefert keine Enzyme</b>, nur die Galle, die Fette emulgiert. Die Enzyme kommen aus der Bauchspeicheldrüse und der Dünndarmschleimhaut.</div>
 <div class="box merk"><span class="t">💡 Eselsbrücken</span>Enzyme der Bauchspeicheldrüse: <b>A</b>m <b>T</b>isch <b>L</b>ernen → <b>A</b>mylase, <b>T</b>rypsin, <b>L</b>ipase.<br><b>Insulin</b> bringt den Zucker <b>in</b> die Zellen → Blutzucker sinkt. <b>Glucagon</b> = „Glucose, go!“ → Blutzucker steigt.</div>
-<div class="box tip"><span class="t">💡 Wusstest du?</span>Die Leber kann sich nach einer Verletzung zu einem großen Teil wieder nachbilden. Das kann kaum ein anderes Organ.</div>
+<div class="box extra"><span class="t">Zusatzwissen (nicht im Heft)</span>Die Leber kann sich nach einer Verletzung zu einem großen Teil wieder nachbilden. Das kann kaum ein anderes Organ.</div>
 `,
     video: [
       { intro: true, say: 'Jetzt lernst du die drei wichtigsten Helfer kennen: Leber, Gallenblase und Bauchspeicheldrüse.' },
@@ -319,7 +320,7 @@ export const CHAPTERS = [
 </ul>
 <div class="box merk"><span class="t">💡 Prinzip der Oberflächenvergrößerung</span><b>Falten → Zotten → Mikrovilli</b>: groß, klein, winzig. Mehr Oberfläche heißt mehr Kontaktfläche, also können viel mehr Nährstoffe aufgenommen werden.</div>
 <div class="box fix"><span class="t">⚠️ Zur Angabe „ca. 1 Tennisplatz“ (Seite 9)</span>Das steht in vielen Schulbüchern (ca. 200 m²) und passt für den Test. Neuere Messungen (2014) kommen eher auf <b>30–40 m²</b>, so viel wie eine kleine Wohnung. Wichtig ist das <b>Prinzip</b>: Falten, Zotten und Mikrovilli vergrößern die Oberfläche riesig.</div>
-<div class="box tip"><span class="t">💡 Wusstest du?</span>Vom Essen bis zur Ausscheidung dauert es meist ein bis drei Tage. Die meiste Zeit davon verbringt der Brei im Dickdarm.</div>
+<div class="box extra"><span class="t">Zusatzwissen (nicht im Heft)</span>Vom Essen bis zur Ausscheidung dauert es meist ein bis drei Tage. Die meiste Zeit davon verbringt der Brei im Dickdarm.</div>
 `,
     video: [
       { intro: true, say: 'Der Dünndarm ist der Star der Verdauung. Hier wird fertig verdaut und alles aufgenommen.' },
@@ -392,7 +393,7 @@ Enzyme erkennst du an der Endung <b>-ase</b>: Malt<b>ase</b> spaltet Malt<b>ose<
 <li><b>Fette:</b> Energiespeicher und Wärmeschutz (ca. 39 kJ pro Gramm, also mehr als doppelt so viel)</li>
 <li><b>Proteine:</b> vor allem Baustoff für Muskeln, Haut, Haare und Enzyme (ca. 17 kJ pro Gramm)</li>
 </ul>
-<div class="box tip"><span class="t">💡 Wusstest du?</span>Fett liefert pro Gramm mehr als doppelt so viel Energie wie Kohlenhydrate oder Eiweiß. Darum speichert der Körper Energie vor allem als Fett.</div>
+<div class="box extra"><span class="t">Zusatzwissen (nicht im Heft)</span>Fett liefert pro Gramm mehr als doppelt so viel Energie wie Kohlenhydrate oder Eiweiß. Darum speichert der Körper Energie vor allem als Fett.</div>
 `,
     video: [
       { intro: true, say: 'Das ist die wichtige Abbildung eins auf Seite acht. Wir verfolgen drei Nährstoffe bis zu ihren Bausteinen.' },
@@ -458,7 +459,7 @@ Enzyme erkennst du an der Endung <b>-ase</b>: Malt<b>ase</b> spaltet Malt<b>ose<
 <tr><td>Erbliche Fruktoseintoleranz (Fruchtzucker)</td><td><b>Aldolase B</b> (in der Leber)</td></tr>
 </table></div>
 <div class="box fix"><span class="t">⚠️ Korrektur zu Seite 10</span>Bei der erblichen Fruktoseintoleranz war dein <b>durchgestrichenes „Aldolase B“ richtig!</b> Ein Enzym „Fruktase“ gibt es nicht.<br><span class="small">Profi-Info: Häufiger ist die <b>Fruktosemalabsorption</b>. Da funktioniert die Aufnahme im Darm nicht richtig (ein Transporter, kein Enzym).</span></div>
-<div class="box tip"><span class="t">💡 Wusstest du?</span>Zöliakie betrifft etwa 1 von 100 Menschen. Viele wissen es gar nicht, weil die Beschwerden sehr unterschiedlich sein können.</div>
+<div class="box extra"><span class="t">Zusatzwissen (nicht im Heft)</span>Zöliakie betrifft etwa 1 von 100 Menschen. Viele wissen es gar nicht, weil die Beschwerden sehr unterschiedlich sein können.</div>
 `,
     video: [
       { intro: true, say: 'Was passiert, wenn die Verdauung nicht richtig klappt? Zum Beispiel bei Zöliakie.' },
@@ -497,7 +498,7 @@ Enzyme erkennst du an der Endung <b>-ase</b>: Malt<b>ase</b> spaltet Malt<b>ose<
 <li>Der Name kommt vom <b>größeren Durchmesser</b>: 5–8 cm (Dünndarm: 2,5 cm).</li>
 <li>Wo der Dünndarm in den Dickdarm mündet, liegt der sackartige <b>Blinddarm</b> mit dem <b>Wurmfortsatz</b> (ca. 10 cm).</li>
 </ul>
-<div class="box tip"><span class="t">🏥 Blinddarmentzündung</span>Entzündet ist eigentlich der <b>Wurmfortsatz</b>, und nur er wird bei der „Blinddarm-OP“ entfernt. Er enthält viele <b>Lymphknoten</b> und hilft bei der <b>Immunabwehr</b>.</div>
+<div class="box heft"><span class="t">Blinddarmentzündung (Heft Seite 11, Kasten „Wusstest du?“)</span>Entzündet ist eigentlich der <b>Wurmfortsatz</b>, und nur er wird bei der „Blinddarm-OP“ entfernt. Er enthält viele <b>Lymphknoten</b> und hilft bei der <b>Immunabwehr</b>.</div>
 <h2>Aufgaben</h2>
 <ul>
 <li>Es werden <b>keine Nährstoffe</b> mehr aufgenommen, nur noch <b>Wasser und Elektrolyte</b> (Salze).</li>
@@ -510,9 +511,9 @@ Enzyme erkennst du an der Endung <b>-ase</b>: Malt<b>ase</b> spaltet Malt<b>ose<
 <li>Sie bauen Stoffe ab, die <b>wir nicht verdauen können</b>, z. B. <b>Cellulose</b> (aus Pflanzen). Damit unterstützen sie unsere Verdauung.</li>
 <li>Dabei entstehen <b>Gase</b>. Ein Teil gelangt über das Blut in die Lunge und wird ausgeatmet, der Rest (0,5–1,5 l pro Tag) geht durch den After.</li>
 </ul>
-<div class="box tip"><span class="t">🔬 Profi-Info</span>Darmbakterien bilden auch Vitamin K. Methan bildet übrigens nur etwa jeder dritte Mensch. Die meisten Darmgase sind Stickstoff, Kohlendioxid und Wasserstoff.</div>
+<div class="box extra"><span class="t">Profi-Info · Zusatzwissen (nicht im Heft)</span>Darmbakterien bilden auch Vitamin K. Methan bildet übrigens nur etwa jeder dritte Mensch. Die meisten Darmgase sind Stickstoff, Kohlendioxid und Wasserstoff.</div>
 <div class="box merk"><span class="t">💡 Dünndarm oder Dickdarm?</span><b>Dünndarm:</b> 5–6 m · dünn (2,5 cm) · Zotten · Nährstoffe aufnehmen<br><b>Dickdarm:</b> 1,5 m · dick (5–8 cm) · keine Zotten · Wasser zurückholen</div>
-<div class="box tip"><span class="t">💡 Wusstest du?</span>Im Darm leben ungefähr so viele Bakterien, wie dein Körper Zellen hat: rund 38 Billionen.</div>
+<div class="box extra"><span class="t">Zusatzwissen (nicht im Heft)</span>Im Darm leben ungefähr so viele Bakterien, wie dein Körper Zellen hat: rund 38 Billionen.</div>
 `,
     video: [
       { intro: true, say: 'Letzte Station: der Dickdarm.' },
@@ -572,7 +573,7 @@ Enzyme erkennst du an der Endung <b>-ase</b>: Malt<b>ase</b> spaltet Malt<b>ose<
 <b>Name verrät das Substrat:</b> Malt<b>ase</b> → Malt<b>ose</b> · Lakt<b>ase</b> → Lakt<b>ose</b> · Lip<b>ase</b> → Lipide (Fette) · Peptid<b>ase</b> → Peptide · Amyl<b>ase</b> → Amylum (lateinisch für Stärke).<br>
 <b>Die „-in“-Enzyme</b> Pepsin und Trypsin knacken Eiweiß.<br>
 <b>Bauchspeicheldrüse:</b> <b>A</b>m <b>T</b>isch <b>L</b>ernen → Amylase, Trypsin, Lipase.</div>
-<div class="box tip"><span class="t">💡 Wusstest du?</span>Bei zu großer Hitze verlieren Enzyme ihre Form (sie denaturieren) und arbeiten nicht mehr. Bei uns arbeiten sie bei etwa 37 °C am besten.</div>
+<div class="box extra"><span class="t">Zusatzwissen (nicht im Heft)</span>Bei zu großer Hitze verlieren Enzyme ihre Form (sie denaturieren) und arbeiten nicht mehr. Bei uns arbeiten sie bei etwa 37 °C am besten.</div>
 `,
     video: [
       { intro: true, say: 'Willkommen in der Enzym-Werkstatt! Enzyme sind wie kleine Scheren.' },
@@ -621,7 +622,7 @@ Enzyme erkennst du an der Endung <b>-ase</b>: Malt<b>ase</b> spaltet Malt<b>ose<
 <p>Gleiches Bild und gleiche Nummern wie auf deinem Arbeitsblatt. Tipp auf eine Nummer, dann siehst du den Namen.</p>
 <div class="figure" data-diagram="neuron" data-arrow="1"></div>
 <div class="tablewrap"><table>
-<tr><th>Nr.</th><th>Bezeichnung</th><th>Funktion <span class="tag warn">Zusatz</span></th></tr>
+<tr><th>Nr.</th><th>Bezeichnung</th><th>Funktion <span class="tag">Aufgabe 2</span></th></tr>
 <tr><td>1</td><td><b>Endknöpfchen</b></td><td>nehmen Kontakt mit anderen Nerven-, Muskel- oder Drüsenzellen auf</td></tr>
 <tr><td>2</td><td><b>Synapse</b></td><td>Kontaktstelle: Die Information wird auf die Zielzelle übertragen</td></tr>
 <tr><td>3</td><td><b>Schwann’sche Zelle</b> (eine Gliazelle)</td><td>bildet die isolierende Schicht (= <b>Myelinscheide</b>, auch Markscheide)</td></tr>
@@ -639,7 +640,7 @@ Enzyme erkennst du an der Endung <b>-ase</b>: Malt<b>ase</b> spaltet Malt<b>ose<
 <b>Nr. 3:</b> „Gliazelle“ passt. Genauer heißt sie <b>Schwann’sche Zelle</b>, eine bestimmte Gliazelle.<br>
 <b>Nr. 8 (Funktion):</b> Nicht „Organe“, sondern <b>Zellorganellen</b> für den Zellstoffwechsel.<br>
 <b>Richtung der Reizleitung:</b> Dein Pfeil (von den Dendriten zu den Endknöpfchen) ist richtig.</div>
-<div class="box tip"><span class="t">💡 Wusstest du?</span>In dicken Nervenfasern mit Myelinscheide sind Signale über 100 Meter pro Sekunde schnell, das sind mehr als 360 km/h.</div>
+<div class="box extra"><span class="t">Zusatzwissen (nicht im Heft)</span>In dicken Nervenfasern mit Myelinscheide sind Signale über 100 Meter pro Sekunde schnell, das sind mehr als 360 km/h.</div>
 `,
     video: [
       { intro: true, say: 'Jetzt kommt die Nervenzelle, auch Neuron genannt. Achtung, das Bild ist wie auf deinem Arbeitsblatt!' },
@@ -887,25 +888,25 @@ export const WORKSHEETS = [
     topics: ['Aufgabe B: Zahnformeln (Dauergebiss 32, Milchgebiss 20)', 'Latein: Incisivi, Canini, Prämolaren, Molaren', 'Wusstest du: Streptokokken und Karies', 'Speiseröhre: >20 Muskeln + Kehldeckel', 'Peristaltik, keine Verdauung', 'Schließmuskel = Ventil', 'Nachweis der Peristaltik (Kopfstand)'],
     tasks: [R('mund-17'), R('mund-18'), R('mund-7'), R('mund-15'), R('mund-12'), R('mund-24'), R('mund-26'), R('mund-16')] },
   { page: 'Seite 5', title: 'Der Magen', ch: 'magen',
-    topics: ['Mageneingang (Magenmund), Magenausgang (Pförtner)', 'speichern, verdauen, durchkneten', '2 l Magensaft: Salzsäure, Schleim, Enzyme', 'Belegzellen, Hauptzellen, Nebenzellen', 'Pepsinogen → Pepsin; Proteine → Peptide', 'Abbildung 13 a + b beschriften', 'Aufgabe a: Fassungsvermögen 1,5–2 l', 'Aufgabe b: Aufgaben der drei Zellarten'],
+    topics: ['Mageneingang (Magenmund), Magenausgang (Pförtner)', 'speichern, verdauen, durchkneten', '2 l Magensaft: Salzsäure, Schleim, Enzyme', 'Belegzellen, Hauptzellen, Nebenzellen', 'Pepsinogen → Pepsin; Proteine → Peptide', 'Abbildung 13: Der Magen (a) und die Magenschleimhaut im Detail (b)', 'Aufgabe a: Fassungsvermögen 1,5–2 l', 'Aufgabe b: Aufgaben der drei Zellarten'],
     tasks: [R('magen-0'), R('magen-1'), R('magen-19'), R('magen-14'), R('magen-2'), K('h-magenzellen'), R('magen-20'), R('magen-11'), R('magen-16')] },
   { page: 'Seite 6', title: 'Sodbrennen · Leber', ch: 'leber',
-    topics: ['Aufgabe c: Sodbrennen', 'Wusstest du: Verweildauer im Magen, Magenknurren', 'Leber: größte Drüse, 1,5–2 kg, zweilappig, Stoffwechselzentrum', 'Galle bilden; Fette, Eiweiße, Glykogen aufbauen', 'Entgiftung, Gerinnungsfaktoren, Eisen, Vitamin A', 'Aufgabe: Abbildung 1 beschriften (Arterie, Gallenblase, Pfortader, Leber, Vene, Bauchspeicheldrüse)'],
+    topics: ['Aufgabe c: Sodbrennen', 'Wusstest du: Verweildauer im Magen, alle 20 Sekunden durchkneten, Magenknurren', 'Leber: größte Drüse, 1,5–2 kg, zweilappig, Stoffwechselzentrum', 'Galle bilden; Fette, Eiweiße, Glykogen aufbauen', 'Entgiftung, Gerinnungsfaktoren, Eisen, Vitamin A', 'Aufgabe: Abbildung 1 beschriften (Arterie, Gallenblase, Pfortader, Leber, Vene, Bauchspeicheldrüse)'],
     tasks: [R('magen-18'), R('magen-21'), R('magen-22'), R('magen-25'), K('h-leberbild'), R('leber-0'), R('leber-15'), R('leber-23')] },
   { page: 'Seite 7', title: 'Gallenblase und Bauchspeicheldrüse · Dünndarm', ch: 'leber',
-    topics: ['Galle: Leber → Gallenblase → Gallengang → Zwölffingerdarm', 'Galle emulgiert Fette (kein Enzym)', 'Bauchspeicheldrüse: Amylase, Trypsin, Lipase', 'Hormone Insulin und Glucagon', 'Brei wird alkalisch (pH > 7)', 'Abbau: Stärke, Proteine, Fette', 'Dünndarm 5–6 m, Zwölffingerdarm ~30 cm'],
+    topics: ['Galle: Leber → Gallenblase → Gallengang → Zwölffingerdarm', 'Galle emulgiert Fette (kein Enzym)', 'Bauchspeicheldrüse: Amylase, Trypsin, Lipase', 'Hormone Insulin und Glucagon', 'Brei wird alkalisch (pH > 7)', 'Abbau: Stärke (Amylase, Maltase), Proteine (Peptidasen, z. B. Trypsin), Fette (Galle, Lipase)', 'Abbildung: Gallenblase und Bauchspeicheldrüse (Gallengang, Mündung, Enzyme)', 'G. Dünndarm: 5–6 m, Zwölffingerdarm ~30 cm, Leerdarm, Krummdarm', 'Abbildung der Dünndarm-Abschnitte (im Heft: „nicht lernen“)'],
     tasks: [R('leber-16'), R('leber-20'), R('leber-7'), R('leber-12'), R('enzyme-20'), R('duenndarm-13'), R('leber-6')] },
   { page: 'Seite 8', title: 'Wie gelangt die Nahrung in alle Körperregionen?', ch: 'abbau',
     topics: ['Nährstoffe müssen in kleinste Bausteine zerlegt werden', 'Ringfalten, Darmzotten, Kapillaren, Lymphgefäße', 'Mikrovilli bilden den Bürstensaum', 'Blut → Pfortader → Leber', 'Lymphe → obere Hohlvene → Blut (Fette)', 'Abbildung 1: Vorgänge bei der Verdauung, mit Erklärung wie man sie liest', 'Aufgabe a: Abbildung 2 beschriften (a Darmzotten, b Mikrovilli, c Blutgefäße, d Lymphgefäß)'],
     tasks: [K('p8-abb1'), K('p8-blut'), K('p8-fett'), K('p8-warum'), K('p8-erkl'), R('abbau-14'), R('abbau-1'), R('abbau-2'), R('abbau-8'), K('p8-abb2'), R('duenndarm-11'), R('duenndarm-14')] },
   { page: 'Seite 9', title: 'Dünndarm: Erläuterungen · Exkurs Zöliakie', ch: 'duenndarm',
-    topics: ['Aufgabe b: Vorgänge bei der Verdauung im Dünndarm erläutern', 'Aufgabe c: Bedeutung der Darmzotten, Oberflächenvergrößerung (ca. 1 Tennisplatz)', 'Zöliakie: Glutenunverträglichkeit (Allergie + Autoimmun)', 'Gluten = Klebereiweiß, Entzündung der Schleimhaut', 'Symptome', 'Abbildung: Bau des Dünndarms (Muskulatur, Kerckring-Falten, Zotte, Krypte …)'],
+    topics: ['Aufgabe b: Vorgänge bei der Verdauung im Dünndarm erläutern', 'Aufgabe c: Bedeutung der Darmzotten, Oberflächenvergrößerung (ca. 1 Tennisplatz)', 'Zöliakie: Glutenunverträglichkeit (Allergie + Autoimmun)', 'Gluten = Klebereiweiß, Entzündung der Schleimhaut', 'Symptome', 'Abbildung 1: Bau des Dünndarms (Muskulatur, Kerckring-Falten, Zotte, Krypte …)'],
     tasks: [R('abbau-13'), R('duenndarm-12'), R('duenndarm-15'), R('duenndarm-17'), R('zoeliakie-9'), R('zoeliakie-0'), R('duenndarm-0')] },
   { page: 'Seite 10', title: 'Zöliakie im Vergleich · Intoleranz', ch: 'zoeliakie',
-    topics: ['Aufgabe a: Große Oberfläche durch Falten, Zotten, Mikrovilli', 'Aufgabe b: Zöliakie vs. gesund, Symptome erklären', 'Intoleranz ≠ Allergie', 'Laktose-, Fruktose-, Histaminintoleranz', 'Informiere dich: Laktase, DAO, Aldolase B'],
+    topics: ['Abbildung 2: Dünndarm gesund und bei Zöliakie im Vergleich', 'Aufgabe a: Große Oberfläche durch Falten, Zotten, Mikrovilli', 'Aufgabe b: Zöliakie vs. gesund, Symptome erklären', 'Intoleranz ≠ Allergie', 'Laktose-, Fruktose-, Histaminintoleranz', 'Informiere dich: Laktase, DAO, Aldolase B'],
     tasks: [K('h-oberflaeche'), R('zoeliakie-8'), R('zoeliakie-10'), R('zoeliakie-4'), K('h-intoleranz'), R('zoeliakie-6'), R('zoeliakie-11')] },
   { page: 'Seite 11', title: 'Der Dickdarm', ch: 'dickdarm',
-    topics: ['1,5 m, keine Zotten, Durchmesser 5–8 cm', 'Blinddarm mit Wurmfortsatz (10 cm)', 'Wasser + Elektrolyte zurück, Kot, Mastdarm, After, Schließmuskel', 'Darmflora baut Cellulose ab', 'Wusstest du: Gase', 'Aufgabe a: Funktion des Wurmfortsatzes', 'Aufgabe b: Wozu Darmbakterien?'],
+    topics: ['1,5 m, keine Zotten, Durchmesser 5–8 cm', 'Blinddarm mit Wurmfortsatz (10 cm)', 'Wusstest du: Entzündung des Wurmfortsatzes, Lymphknoten', 'Wasser + Elektrolyte zurück, Kot, Mastdarm, After, Schließmuskel', 'Darmflora baut Cellulose ab', 'Wusstest du: Gase', 'Aufgabe a: Funktion des Wurmfortsatzes', 'Aufgabe b: Wozu Darmbakterien?'],
     tasks: [R('dickdarm-11'), R('dickdarm-1'), R('dickdarm-2'), R('dickdarm-19'), R('dickdarm-10'), R('dickdarm-8')] },
   { page: 'Arbeitsblatt', title: 'Aufbau und Funktion eines Neurons', ch: 'neuron',
     topics: ['Aufgabe 1: Richtung der Reizleitung einzeichnen', 'Aufgabe 2: 9 Bestandteile beschriften', 'Funktionen in der Tabelle ergänzen'],
@@ -916,6 +917,7 @@ export const WORKSHEETS = [
 for (const ch of CHAPTERS) ch.q.forEach((q, i) => { q.id = `${ch.id}-${i}`; q.ch = ch.id; });
 export const chapterById = (id) => CHAPTERS.find((c) => c.id === id);
 export const ALL_QUESTIONS = CHAPTERS.flatMap((c) => c.q);
+for (const q of ALL_QUESTIONS) q.src = Q_SRC[q.id] || null;
 for (const w of WORKSHEETS) for (const t of w.tasks) if (t.key) t.ref = ALL_QUESTIONS.find((q) => q.key === t.key).id;
 
 /* ---------- Steckbrief-Karten (Quartett style): compact facts per organ / enzyme / part ---------- */
@@ -994,6 +996,7 @@ export const CARDS = {
   ],
 };
 
+
 /* more cards so the whole booklet is covered (incl. all "Wusstest du?" boxes) */
 const MORE_CARDS = {
   ueberblick: [
@@ -1051,3 +1054,5 @@ for (const [k, order] of Object.entries(CARD_ORDER)) {
   const rank = (c) => { const i = order.indexOf(c.t); return i < 0 ? 100 + (c.n || 0) : i; };
   CARDS[k].sort((a, b) => rank(a) - rank(b));
 }
+/* sources: CARD_SRC follows this final order */
+for (const [k, list] of Object.entries(CARDS)) list.forEach((c, i) => { c.src = (CARD_SRC[k] || [])[i] || null; });

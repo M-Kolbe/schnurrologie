@@ -9,6 +9,7 @@ import { icon as I, CH_ICON } from './icons.js';
 import * as snd from './audio.js';
 import * as voice from './voice.js';
 import { GLOSSARY } from './glossary.js';
+import { srcHTML, srcShort, DIAGRAM_SRC, LEARN_SRC } from './sources.js';
 
 const app = $('#app');
 const QBYID = Object.fromEntries(ALL_QUESTIONS.map((q) => [q.id, q]));
@@ -134,13 +135,13 @@ function explainMore(q, res) {
     const nums = numbering(q.d, q.t === 'label' && q.parts !== 'all' ? ids : null);
     items = ids.map((id) => { const p = D.parts.find((x) => x.id === id); return `<b>${nums[id]} ${esc(p.name)}:</b> ${esc(p.info)}`; });
   } else if (q.t === 'explain' || q.t === 'formula' || q.t === 'grid') {
-    return '';
+    items = [];
   } else {
     const text = [q.a, res.answer, ...(q.right || []), ...(q.items || []).slice(0, 3), ...(q.pairs || []).flat()].join(' · ');
     items = glossFor(text, q.t === 'match' ? 3 : 2, res.html || '').map((g) => `<b>${esc(g.t)}:</b> ${esc(g.d)}`);
   }
-  if (!items.length) return '';
-  return `<div class="howto"><div class="howto-t">${I('bulb')} So funktioniert’s</div>${items.map((x) => `<div>${x}</div>`).join('')}</div>`;
+  const how = items.length ? `<div class="howto"><div class="howto-t">${I('bulb')} So funktioniert’s</div>${items.map((x) => `<div>${x}</div>`).join('')}</div>` : '';
+  return how + (q.src ? `<div class="nachlesen"><div class="howto-t">${I('book')} Nachlesen</div>${srcHTML(q.src)}</div>` : '');
 }
 
 function videoList(list) {
@@ -290,7 +291,7 @@ function topics() {
   s.append(list);
   s.append(h('div', { class: 'section-title' }, ico('image'), 'Alle Abbildungen'));
   const g = h('div', { class: 'chips' });
-  Object.entries(DIAGRAMS).forEach(([id, d]) => g.append(h('a', { class: 'chip', href: '#/bild/' + id }, d.title)));
+  Object.entries(DIAGRAMS).forEach(([id, d]) => g.append(h('a', { class: 'chip', href: '#/bild/' + id }, d.title, DIAGRAM_SRC[id] ? h('span', { class: 'chipsrc' }, srcShort(DIAGRAM_SRC[id])) : null)));
   s.append(g);
   app.append(s);
 }
@@ -364,6 +365,7 @@ function cards(id) {
     });
     card.append(tb);
     if (c.tip) card.append(h('div', { class: 'qt' }, ico('bulb'), h('span', null, c.tip)));
+    if (c.src) card.append(h('div', { class: 'qsrc', html: srcHTML(c.src) }));
     deck.append(card);
   });
   const dots = h('div', { class: 'deckdots', style: { display: S.cardsView === 'list' ? 'none' : '' } }, list.map((_, i) => h('i', { class: i === 0 ? 'on' : '' })));
@@ -381,7 +383,7 @@ function cards(id) {
 }
 
 /* ---------- Lernkarte ---------- */
-const BOX_ICON = { merk: 'bulb', fix: 'alert', tip: 'info' };
+const BOX_ICON = { extra: 'sparkle', heft: 'book', merk: 'bulb', fix: 'alert', tip: 'info' };
 function learn(id) {
   const ch = chapterById(id);
   tabs('lernen');
@@ -394,12 +396,18 @@ function learn(id) {
     t.textContent = t.textContent.replace(/^[^\p{L}\d]+/u, '').trim();
     if (kind) t.prepend(ico(BOX_ICON[kind]));
   });
+  const LS = LEARN_SRC[id] || {};
+  $$('h2, h3', c).forEach((hd) => {
+    const key = [...hd.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim();
+    if (LS[key]) hd.after(h('div', { class: 'secsrc', html: srcHTML(LS[key]) }));
+  });
   s.append(c);
   $$('[data-diagram]', c).forEach((f) => {
     const did = f.dataset.diagram;
     const d = h('div', { class: 'diagram', html: diagramSVG(did, { arrow: !!f.dataset.arrow }) });
     const cap = h('div', { class: 'cap' }, 'Tipp auf eine Nummer.');
     f.append(d, cap);
+    if (DIAGRAM_SRC[did]) f.append(h('div', { class: 'figsrc', html: srcHTML(DIAGRAM_SRC[did]) }));
     const nums = numbering(did);
     d.addEventListener('click', (e) => {
       const mk = e.target.closest('.mk'); if (!mk) return;
@@ -429,6 +437,7 @@ function explore(did) {
   const s = h('div', { class: 'screen' });
   s.append(back('#/themen', 'Abbildungen'), h('h1', null, D.title));
   if (D.note) s.append(h('p', { class: 'small muted' }, D.note));
+  if (DIAGRAM_SRC[did]) s.append(h('div', { class: 'figsrc', style: { marginBottom: '10px' }, html: srcHTML(DIAGRAM_SRC[did]) }));
   const d = h('div', { class: 'diagram card', html: diagramSVG(did, { arrow: did === 'neuron' }) });
   const cap = h('div', { class: 'card tint-teal', style: { marginTop: '10px', minHeight: '76px' } }, 'Tipp auf eine Nummer. Dann siehst du den Namen und was der Teil macht.');
   s.append(d, cap);
@@ -509,6 +518,7 @@ function film(id) {
       inner = h('div', { class: 'scene diagram', html: diagramSVG(sc.d, { markers: false, arrow: sc.d === 'neuron' }) }); highlight(inner, sc.hl || []);
       const names = (sc.hl || []).map((pid) => DIAGRAMS[sc.d].parts.find((p) => p.id === pid)?.name).filter(Boolean);
       if (names.length) stage.append(h('div', { class: 'focuschip' }, ico('target'), 'Im Fokus: ' + names.join(' · ')));
+      if (DIAGRAM_SRC[sc.d]) stage.append(h('div', { class: 'filmsrc' }, ico('book'), (DIAGRAM_SRC[sc.d].kind === 'heft' ? 'Heft ' : 'App, ') + srcShort(DIAGRAM_SRC[sc.d])));
     }
     else if (sc.big) inner = h('div', { class: 'scene' }, h('div', { class: 'bigtext' }, h('div', { class: 'bt', html: esc(sc.big).replace(/\n/g, '<br>') }), h('div', { class: 'mini', html: chapterArt(CH_ICON[ch.id], ch.color, 0, true) })));
     else {
@@ -1151,7 +1161,7 @@ function runExam({ items, minutes, title, againHref, history, resume }) {
     });
     body.append(h('div', { class: 'stack', style: { marginTop: '14px' } },
       S.retry.length ? h('a', { class: 'btn coral block', href: '#/nochmal' }, ico('target'), `Nur die ${S.retry.length} Fehler nochmal üben`) : null,
-      h('a', { class: 'btn lav block', href: againHref }, ico('refresh'), 'Nochmal mit neuen Aufgaben'), h('a', { class: 'btn ghost block', href: '#/' }, 'Zur Klinik')));
+      h('a', { class: 'btn lav block', href: againHref }, ico('refresh'), 'Nochmal mit neuen Aufgaben'), h('a', { class: 'btn ghost block', href: '#/' }, 'Zur Startseite')));
     checkUnlocks();
   }
 }

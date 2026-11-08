@@ -4,6 +4,7 @@ import { h, shuffle, sample, pick, matchAnswer, esc } from './util.js';
 import { DIAGRAMS, diagramSVG, numbering, highlight } from './diagrams.js';
 import { ENZYME_GRID } from './content.js';
 import * as snd from './audio.js';
+import { srcHTML } from './sources.js';
 
 const TYPE_NAMES = {
   fact: 'Frage', mc: 'Auswahl', multi: 'Mehrere richtig', tf: 'Richtig oder falsch?', match: 'Zuordnen', order: 'Reihenfolge',
@@ -18,8 +19,9 @@ export const usableAt = (q, level) => (level === 1 ? L1 : L2).has(q.t);
 export function renderQuestion(q, ctx) {
   const wrap = h('div', { class: 'qcard' });
   const kind = h('div', { class: 'qkind' }, ctx.level === 2 && ['fact', 'cloze', 'label', 'grid', 'formula'].includes(q.t) ? 'Eintippen · ' : '', TYPE_NAMES[q.t] || '');
-  if (q.heft) kind.append(h('span', { class: 'heft' }, 'Aus dem Heft · ' + q.heft));
+  if (q.heft && /Aufgabe|Nachweis|Informiere/.test(q.heft)) kind.append(h('span', { class: 'heft' }, 'Originalaufgabe aus dem Heft'));
   wrap.append(kind);
+  if (q.src) wrap.append(h('div', { class: 'qsrc', html: srcHTML(q.src) }));
   const R = RENDER[q.t];
   R(q, ctx, wrap);
   return wrap;
